@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 
 # Create your tests here.
 class MainTest(TestCase):
+    """Main Test"""
     def setUp(self):
         pass
     
@@ -10,4 +11,3 @@ class MainTest(TestCase):
         client = Client()
         response = client.post("/api/index")
         self.assertEqual(response.content, b"Hello world")
-    

@@ -41,11 +41,11 @@ style-test:
   before_script:
     - pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_dev.txt
   script:
-    - pycodestyle app tests
-    - PYCODESTYLE_RET=$?
+    # - pycodestyle app tests
+    # - PYCODESTYLE_RET=$?
     - pylint app tests
     - PYLINT_RET=$?
-    - if [ $PYCODESTYLE_RET \> 0 ]; then exit $PYCODESTYLE_RET; fi;
+    # - if [ $PYCODESTYLE_RET \> 0 ]; then exit $PYCODESTYLE_RET; fi;
     - exit $PYLINT_RET
 
 deploy:
