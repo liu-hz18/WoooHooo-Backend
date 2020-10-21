@@ -41,7 +41,7 @@ style-test:
   before_script:
     - pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_dev.txt
   script:
-    # - pycodestyle app tests
+    # - pycodestyle app login
     # - PYCODESTYLE_RET=$?
     - pylint app login
     - PYLINT_RET=$?
