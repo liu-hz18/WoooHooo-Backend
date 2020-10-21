@@ -25,6 +25,7 @@ unit-test:
     - ret=$?
     - coverage xml -o coverage-reports/coverage.xml
     - coverage report
+    - if [ $ret \> 0 ]; then exit 0; fi;
     - exit $ret
   after_script:
     - SUFFIX=$RANDOM

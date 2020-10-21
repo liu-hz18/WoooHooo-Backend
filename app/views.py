@@ -1,7 +1,8 @@
-from django.shortcuts import render, HttpResponse
-
+""" app/views.py """
+from django.shortcuts import HttpResponse
 # Create your views here.
 
 
 def index(request):
-    return HttpResponse("Hello world")
+    """function index"""
+    return HttpResponse(f"Hello world {request}")

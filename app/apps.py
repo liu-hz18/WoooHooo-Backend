@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
 
-class AppConfig(AppConfig):
+class AppLocalConfig(AppConfig):
+    """AppLocalConfig subclass of AppConfig"""
     name = 'app'
