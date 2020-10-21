@@ -45,7 +45,7 @@ style-test:
     - pylint app tests
     - PYLINT_RET=$?
     - if [ $PYCODESTYLE_RET \> 0 ]; then exit $PYCODESTYLE_RET; fi;
-    # - exit $PYLINT_RET
+    - exit $PYLINT_RET
 
 deploy:
   stage: deploy
