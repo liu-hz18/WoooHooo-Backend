@@ -5,4 +5,4 @@ from django.shortcuts import HttpResponse
 
 def index(request):
     """function index"""
-    return HttpResponse(f"Hello world {request}")
+    return HttpResponse("Hello world")
