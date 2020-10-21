@@ -43,7 +43,7 @@ style-test:
   script:
     # - pycodestyle app tests
     # - PYCODESTYLE_RET=$?
-    - pylint app tests
+    - pylint app login
     - PYLINT_RET=$?
     # - if [ $PYCODESTYLE_RET \> 0 ]; then exit $PYCODESTYLE_RET; fi;
     - exit $PYLINT_RET

@@ -1,8 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
-import json
-from .models import User
 from django.core.exceptions import ValidationError
+from .models import User
 
 
 def login(request):
@@ -20,16 +19,14 @@ def login(request):
         if not password or not username:
             return gen_response(400, "format is wrong")
         #利用用户名获取用户
-        user=User.objects.filter(name=username).first()
+        user = User.objects.filter(name=username).first()
         #若用户不存在
         if not user:
             return gen_response(400, "username Error")
         #检查密码
-        else:
-            if user.password==password:
-                return gen_response(200, "successful user validation")
-            else:
-                return gen_response(401, "password Error")
+        if user.password==password:
+            return gen_response(200, "successful user validation")
+        return gen_response(401, "password Error")
     #用Post来完成注册
     elif request.method == 'POST':
         username = request.POST.get('username')
