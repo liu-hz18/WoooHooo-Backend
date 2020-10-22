@@ -41,7 +41,8 @@ def search(request):
         return JsonResponse({
             'code': code,
             'data': data,
-            'keywords': keywords
+            'keywords': keywords,
+            'total': 0,
         })
     if request.method == "GET":
         keywords = []
