@@ -1,8 +1,9 @@
+import json
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.core.exceptions import ValidationError
 from .models import User
-import json
+
 
 def login(request):
     def gen_response(code: int, data: str):
