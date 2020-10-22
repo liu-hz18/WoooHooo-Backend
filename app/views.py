@@ -73,20 +73,8 @@ def search(request):
         print(page, number, news_type)
         if page is None or number is None or news_type is None or page < 0 or number > 100:
             return gen_bad_response(400, [], [news_type])
-<<<<<<< HEAD
         page, number = int(page), int(number)
         total, newslist = fetch_typed_news(news_type, number, page)
-=======
-        newslist = [{
-            'uid': i,
-            'link': "https://www.baidu.com",
-            'title': f" This is a random news from backend {news_type}{i+page*number}"  * 10,
-            'content': f"这是新闻内容，{news_type}" * 20,
-            'imgurl': "http://inews.gtimg.com/newsapp_ls/0/12576682689_640330/0" if randint(0, 1) else "",
-            'source': "xinhua net",
-            'time': "2020.1.1",
-        } for i in range(number)]
->>>>>>> 0aa6933 (upd: change hardcoded url to API.js)
         return JsonResponse({
             'code': 200,
             'data': newslist,

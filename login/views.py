@@ -24,8 +24,13 @@ def login(request):
         password = request.GET.get('userpass', default="")
         print("username: ", username, "password: ", password)
         #如果前端没传过来用户名和密码
+<<<<<<< HEAD
         if password == "" or username == "":
             return gen_response(405, "there is no username or password or None")
+=======
+        if not password or not username:
+            return gen_response(400, "there is no username or password")
+>>>>>>> f770fff (update:change the reponse information if something is wrong)
         #利用用户名获取用户
         user = User.objects.filter(name=username).first()
         #若用户不存在
@@ -46,7 +51,11 @@ def login(request):
         password = user.get('userpass')
         if not username or not password:
             return gen_response(400, "there is no username or password")
+<<<<<<< HEAD
         # 检查用户是否已经存在
+=======
+        #检查用户是否已经存在
+>>>>>>> f770fff (update:change the reponse information if something is wrong)
         user = User.objects.filter(name=username).first()
         if user:
             return gen_response(401, "user is already existed")
