@@ -14,9 +14,10 @@ def login(request):
 
     #Get用来验证登录
     if request.method == 'GET':
-        print(request.body.decode())
-        username = request.GET.get('username')
-        password = request.GET.get('userpass')
+        user = json.loads(request.body.decode())
+        print(user)
+        username = user.get('username')
+        password = user.get('userpass')
         #如果前端没传过来用户名和密码
         if not password or not username:
             return gen_response(400, "there is no username or password")
@@ -48,7 +49,7 @@ def login(request):
             user.full_clean()
             # 存入数据库
             user.save()
-            return gen_response(201, "user was set successfully")
+            return gen_response(200, "user was set successfully")
         except ValidationError as e:
             return gen_response(400, "length Error of user: {}".format(e))
 
