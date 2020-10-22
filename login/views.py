@@ -17,7 +17,7 @@ def login(request):
         password = request.GET.get('userpass')
         #如果前端没传过来用户名和密码
         if not password or not username:
-            return gen_response(400, "format is wrong")
+            return gen_response(400, "there is no username or password")
         #利用用户名获取用户
         user = User.objects.filter(name=username).first()
         #若用户不存在
@@ -32,7 +32,7 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('userpass')
         if not username or not password:
-            return gen_response(401, "format is wrong")
+            return gen_response(400, "there is no username or password")
         #检查用户是否已经存在
         user = User.objects.filter(name=username).first()
         if user:
