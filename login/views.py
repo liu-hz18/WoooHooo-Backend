@@ -14,6 +14,7 @@ def login(request):
 
     #Get用来验证登录
     if request.method == 'GET':
+        print(request.body.decode())
         username = request.GET.get('username')
         password = request.GET.get('userpass')
         #如果前端没传过来用户名和密码
@@ -31,6 +32,7 @@ def login(request):
     #用Post来完成注册
     elif request.method == 'POST':
         user = json.loads(request.body.decode())
+        print(user)
         username = user.get('username')
         password = user.get('userpass')
         if not username or not password:
