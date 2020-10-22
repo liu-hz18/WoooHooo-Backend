@@ -1,10 +1,10 @@
 """ app/views.py """
+import json
 from random import randint
+import jieba
 from django.http.response import JsonResponse
 from django.shortcuts import HttpResponse
-import jieba
-import random
-import json
+
 # Create your views here.
 
 
@@ -88,4 +88,3 @@ def search(request):
             'data': newslist,
             'keywords': [news_type],
         })
-        
