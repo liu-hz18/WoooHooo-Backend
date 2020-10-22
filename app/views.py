@@ -52,6 +52,7 @@ def search(request):
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
+        total = 1000
         newslist = [{
             'uid': i,
             'link': "https://www.baidu.com",
@@ -65,6 +66,7 @@ def search(request):
             'code': 200,
             'data': newslist,
             'keywords': keywords,
+            'total': total
         })
     elif request.method == "POST":
         jsonObj = json.loads(request.body.decode())
