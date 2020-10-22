@@ -51,7 +51,7 @@ def search(request):
         query = request.GET.get('query', default="")
         keywords = jieba.lcut_for_search(query)
         print(page, number, query, keywords)
-        if page < 0 or number > 100 or query == "":       
+        if page < 0 or number > 100:       
             return gen_bad_response(400, [], keywords)
         total = 1000
         newslist = [{
@@ -70,12 +70,13 @@ def search(request):
             'total': total
         })
     elif request.method == "POST":
+        print(request.body.decode())
         jsonObj = json.loads(request.body.decode())
         page = int(jsonObj.get('page'))
         number = int(jsonObj.get('number'))
         news_type = jsonObj.get('newstype')
         print(page, number, news_type)
-        if page is None or number is None or news_type is None or page < 0 or number > 100 or news_type == "":
+        if page is None or number is None or news_type is None or page < 0 or number > 100:
             return gen_bad_response(400, [], [news_type])
         newslist = [{
             'uid': i,
