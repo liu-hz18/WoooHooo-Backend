@@ -29,8 +29,9 @@ def login(request):
         return gen_response(401, "password Error")
     #用Post来完成注册
     elif request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('userpass')
+        user = json.loads(request.body.decode())
+        username = user.get('username')
+        password = user.get('userpass')
         if not username or not password:
             return gen_response(400, "there is no username or password")
         #检查用户是否已经存在
