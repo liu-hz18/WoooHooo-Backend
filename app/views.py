@@ -57,7 +57,7 @@ def search(request):
         newslist = [{
             'uid': i,
             'link': "https://www.baidu.com",
-            'title': f" This is a random news {query} {i+page*number} "  * 10,
+            'title': f" This is a random news from backend {query} {i+page*number} "  * 10,
             'content': "这是新闻内容，" * 20,
             'imgurl': "http://inews.gtimg.com/newsapp_ls/0/12576682689_640330/0" if randint(0, 1) else "",
             'source': "xinhua net",
@@ -81,7 +81,7 @@ def search(request):
         newslist = [{
             'uid': i,
             'link': "https://www.baidu.com",
-            'title': f" This is a random news {news_type}{i+page*number}"  * 10,
+            'title': f" This is a random news from backend {news_type}{i+page*number}"  * 10,
             'content': f"这是新闻内容，{news_type}" * 20,
             'imgurl': "http://inews.gtimg.com/newsapp_ls/0/12576682689_640330/0" if randint(0, 1) else "",
             'source': "xinhua net",
