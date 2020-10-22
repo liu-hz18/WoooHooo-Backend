@@ -17,8 +17,6 @@ def gen_response(code: int, data: str):
 def login(request):
     #Get用来验证登录
     if request.method == 'GET':
-        username = ""
-        password = ""
         print(request.GET.items())
         username = request.GET.get('username', default="")
         password = request.GET.get('userpass', default="")
@@ -37,11 +35,16 @@ def login(request):
         return gen_response(401, "password Error")
     #用Post来完成注册
     elif request.method == 'POST':
+<<<<<<< HEAD
         print(request.body.decode())
         try:
             user = json.loads(request.body.decode())
         except json.JSONDecodeError:
             return gen_response(403 , "the data is not json")
+=======
+        user = json.loads(request.body.decode())
+        print(user)
+>>>>>>> 4b9561b (update:print the request body after receive the request)
         username = user.get('username')
         password = user.get('userpass')
         if not username or not password:
