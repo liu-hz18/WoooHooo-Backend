@@ -22,7 +22,7 @@ ignore-patterns=
 
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use.
-jobs=1
+jobs=0
 
 # Control the amount of potential inferred values when inferring a single
 # object. This can help the performance when dealing with large functions or
@@ -149,7 +149,11 @@ disable=print-statement,
         trailing-newlines,
         trailing-whitespace,
         no-else-return,
-        too-many-return-statements
+        too-many-return-statements,
+        too-many-boolean-expressions,
+        unused-variable,
+        broad-except
+        
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
