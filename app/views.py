@@ -51,7 +51,7 @@ def search(request):
         query = request.GET.get('query', default="")
         keywords = sorted(jieba.lcut_for_search(query), key=len, reverse=True)
         print(page, number, query, keywords)
-        if page < 0 or number > 100:       
+        if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
         try:
             total, newslist = fetch_search_result(query, number, page)
