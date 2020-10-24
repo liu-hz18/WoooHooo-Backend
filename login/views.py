@@ -14,13 +14,24 @@ def login(request):
 
     #Get用来验证登录
     if request.method == 'GET':
+        '''
+        try:
+            user = json.loads(request.body.decode())
+        except json.JSONDecodeError:
+            return gen_response(403 , "the data is not json")
         user = json.loads(request.body.decode())
+        if not user:
+            return gen_response(402, "user is null")
         print(user)
         username = user.get('username')
         password = user.get('userpass')
+        '''
+        username = request.GET.get('username')
+        password = request.GET.get("userpass")
         #如果前端没传过来用户名和密码
         if not password or not username:
-            return gen_response(400, "there is no username or password")
+            return gen_response(405, "there is no username or password")
+        print(username)
         #利用用户名获取用户
         user = User.objects.filter(name=username).first()
         #若用户不存在
@@ -32,8 +43,10 @@ def login(request):
         return gen_response(401, "password Error")
     #用Post来完成注册
     elif request.method == 'POST':
-        user = json.loads(request.body.decode())
-        print(user)
+        try:
+            user = json.loads(request.body.decode())
+        except json.JSONDecodeError:
+            return gen_response(403 , "the data is not json")
         username = user.get('username')
         password = user.get('userpass')
         if not username or not password:
