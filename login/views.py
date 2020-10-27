@@ -26,10 +26,18 @@ def login(request):
         username = user.get('username')
         password = user.get('userpass')
         '''
-        username = request.GET.get('username')
-        password = request.GET.get("userpass")
+        username = ""
+        password = ""
+        for k,v in request.GET.items():
+            print(k)
+            print(v)
+            if k == "username":
+                username = v
+            elif k == "userpass":
+                password = v
+                print(password)
         #如果前端没传过来用户名和密码
-        if not password or not username:
+        if password == "" or username == "":
             return gen_response(405, "there is no username or password")
         print(username)
         #利用用户名获取用户
