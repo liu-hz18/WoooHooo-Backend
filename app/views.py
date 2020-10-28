@@ -50,17 +50,10 @@ def search(request):
         number = 0
         query = ""
         print(request.body.decode())
-        # for key, value in request.GET.items():
-        #     if key == "page":
-        #         page = value
-        #     elif key == "number":
-        #         number = value
-        #     elif key == "query":
-        #         query = value
         page = int(request.GET.get('page', default=0))
         number = int(request.GET.get('number', default=10))
         query = request.GET.get('query', default="")
-        keywords = jieba.lcut_for_search(query)
+        keywords = sorted(jieba.lcut_for_search(query), key = lambda word:len(word), reverse=True)
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
