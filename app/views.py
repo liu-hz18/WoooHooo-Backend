@@ -75,10 +75,10 @@ def search(request):
         })
     elif request.method == "POST":
         print(request.body.decode())
-        jsonObj = json.loads(request.body.decode())
-        page = jsonObj.get('page')
-        number = jsonObj.get('number')
-        news_type = jsonObj.get('newstype')
+        json_obj = json.loads(request.body.decode())
+        page = json_obj.get('page')
+        number = json_obj.get('number')
+        news_type = json_obj.get('newstype')
         print(page, number, news_type)
         if page is None or number is None or news_type is None or page < 0 or number > 100:
             return gen_bad_response(400, [], [news_type])
@@ -96,6 +96,6 @@ def search(request):
         return JsonResponse({
             'code': 200,
             'data': newslist,
-            'keywords': [news_type],
+            'keywords': [],
             'total': total,
         })
