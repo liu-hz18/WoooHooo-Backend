@@ -56,18 +56,19 @@ def search(request):
         number = 0
         query = ""
         print(request.body.decode())
-        # for key, value in request.GET.items():
-        #     if key == "page":
-        #         page = value
-        #     elif key == "number":
-        #         number = value
-        #     elif key == "query":
-        #         query = value
         page = int(request.GET.get('page', default=0))
         number = int(request.GET.get('number', default=10))
         query = request.GET.get('query', default="")
+<<<<<<< HEAD
+<<<<<<< HEAD
         keywords = jieba.lcut_for_search(query)
 >>>>>>> 29c9924 (change: move useless / url and update GET api)
+=======
+        keywords = sorted(jieba.lcut_for_search(query), key = lambda word:len(word), reverse=True)
+>>>>>>> 408b019 (upd: keyword cut will be sorted by length)
+=======
+        keywords = sorted(jieba.lcut_for_search(query), key=len, reverse=True)
+>>>>>>> 4b9f76e (upd: keyword cut will be sorted by length)
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
@@ -84,15 +85,34 @@ def search(request):
         }, status=200)
     elif request.method == "POST":
         print(request.body.decode())
+<<<<<<< HEAD
         json_obj = json.loads(request.body.decode())
         page = json_obj.get('page')
         number = json_obj.get('number')
         news_type = json_obj.get('newstype')
+=======
+        jsonObj = json.loads(request.body.decode())
+        page = jsonObj.get('page')
+        number = jsonObj.get('number')
+        news_type = jsonObj.get('newstype')
+>>>>>>> 4b9f76e (upd: keyword cut will be sorted by length)
         print(page, number, news_type)
         if page is None or number is None or news_type is None or page < 0 or number > 100:
             return gen_bad_response(400, [], [news_type])
         page, number = int(page), int(number)
+<<<<<<< HEAD
         total, newslist = fetch_typed_news(news_type, number, page)
+=======
+        newslist = [{
+            'uid': i,
+            'link': "https://www.baidu.com",
+            'title': f" This is a random news from backend {news_type}{i+page*number}"  * 10,
+            'content': f"这是新闻内容，{news_type}" * 20,
+            'imgurl': "http://inews.gtimg.com/newsapp_ls/0/12576682689_640330/0" if randint(0, 1) else "",
+            'source': "xinhua net",
+            'time': "2020.1.1",
+        } for i in range(number)]
+>>>>>>> 4b9f76e (upd: keyword cut will be sorted by length)
         return JsonResponse({
             'code': 200,
             'data': newslist,
