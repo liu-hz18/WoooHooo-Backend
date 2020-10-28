@@ -56,11 +56,6 @@ def search(request):
                 number = value
             elif key == "query":
                 query = value
-        '''
-        page = int(request.GET.get('page', default=0))
-        number = int(request.GET.get('number', default=10))
-        query = request.GET.get('query', default="")
-        '''
         keywords = jieba.lcut_for_search(query)
         print(page, number, query, keywords)
         if page < 0 or number > 100:       
