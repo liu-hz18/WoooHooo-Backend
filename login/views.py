@@ -14,18 +14,6 @@ def login(request):
 
     #Get用来验证登录
     if request.method == 'GET':
-        '''
-        try:
-            user = json.loads(request.body.decode())
-        except json.JSONDecodeError:
-            return gen_response(403 , "the data is not json")
-        user = json.loads(request.body.decode())
-        if not user:
-            return gen_response(402, "user is null")
-        print(user)
-        username = user.get('username')
-        password = user.get('userpass')
-        '''
         username = ""
         password = ""
         for k,v in request.GET.items():
