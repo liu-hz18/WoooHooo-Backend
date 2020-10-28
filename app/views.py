@@ -83,6 +83,7 @@ def search(request):
         if page is None or number is None or news_type is None or page < 0 or number > 100:
             return gen_bad_response(400, [], [news_type])
         page, number = int(page), int(number)
+        total = 1024
         newslist = [{
             'uid': i,
             'link': "https://www.baidu.com",
@@ -96,4 +97,5 @@ def search(request):
             'code': 200,
             'data': newslist,
             'keywords': [news_type],
+            'total': total,
         })
