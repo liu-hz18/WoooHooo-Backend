@@ -49,16 +49,20 @@ def search(request):
         page = 0
         number = 0
         query = ""
-        for key, value in request.GET.items():
-            if key == "page":
-                page = value
-            elif key == "number":
-                number = value
-            elif key == "query":
-                query = value
+        print(request.body.decode())
+        # for key, value in request.GET.items():
+        #     if key == "page":
+        #         page = value
+        #     elif key == "number":
+        #         number = value
+        #     elif key == "query":
+        #         query = value
+        page = int(request.GET.get('page', default=0))
+        number = int(request.GET.get('number', default=10))
+        query = request.GET.get('query', default="")
         keywords = jieba.lcut_for_search(query)
         print(page, number, query, keywords)
-        if page < 0 or number > 100:       
+        if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
         total = 1000
         newslist = [{
