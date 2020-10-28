@@ -53,7 +53,7 @@ def search(request):
         page = int(request.GET.get('page', default=0))
         number = int(request.GET.get('number', default=10))
         query = request.GET.get('query', default="")
-        keywords = sorted(jieba.lcut_for_search(query), key = lambda word:len(word), reverse=True)
+        keywords = sorted(jieba.lcut_for_search(query), key=len, reverse=True)
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
@@ -76,12 +76,13 @@ def search(request):
     elif request.method == "POST":
         print(request.body.decode())
         jsonObj = json.loads(request.body.decode())
-        page = int(jsonObj.get('page'))
-        number = int(jsonObj.get('number'))
+        page = jsonObj.get('page')
+        number = jsonObj.get('number')
         news_type = jsonObj.get('newstype')
         print(page, number, news_type)
         if page is None or number is None or news_type is None or page < 0 or number > 100:
             return gen_bad_response(400, [], [news_type])
+        page, number = int(page), int(number)
         newslist = [{
             'uid': i,
             'link': "https://www.baidu.com",
