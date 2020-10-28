@@ -101,8 +101,12 @@ def search(request):
             return gen_bad_response(400, [], [news_type])
         page, number = int(page), int(number)
 <<<<<<< HEAD
+<<<<<<< HEAD
         total, newslist = fetch_typed_news(news_type, number, page)
 =======
+=======
+        total = 1024
+>>>>>>> ee3216d (upd: add 	otal param in news type api)
         newslist = [{
             'uid': i,
             'link': "https://www.baidu.com",
@@ -116,6 +120,12 @@ def search(request):
         return JsonResponse({
             'code': 200,
             'data': newslist,
+<<<<<<< HEAD
             'keywords': [],
             'total': total,
         }, status=200)
+=======
+            'keywords': [news_type],
+            'total': total,
+        })
+>>>>>>> ee3216d (upd: add 	otal param in news type api)
