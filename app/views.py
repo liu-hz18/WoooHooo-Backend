@@ -60,6 +60,7 @@ def search(request):
         page = 0
         number = 0
         query = ""
+<<<<<<< HEAD
         print(request.body.decode())
         page = int(request.GET.get('page', default=0))
         number = int(request.GET.get('number', default=10))
@@ -72,6 +73,17 @@ def search(request):
         keywords = sorted(jieba.lcut_for_search(query), key = lambda word:len(word), reverse=True)
 >>>>>>> 408b019 (upd: keyword cut will be sorted by length)
 =======
+=======
+        for k,v in request.GET.items():
+            print(k)
+            print(v)
+            if k == "page":
+                page = v
+            elif k == "number":
+                number = v
+            elif k == "query":
+                query = v
+>>>>>>> 82bd108 (fix:fix the get request)
         keywords = sorted(jieba.lcut_for_search(query), key=len, reverse=True)
 >>>>>>> 4b9f76e (upd: keyword cut will be sorted by length)
         print(page, number, query, keywords)
@@ -87,6 +99,7 @@ def search(request):
 =======
         total = 1000
         #向java端发送检索请求
+        newslist = None
         try:
             httpClient = http.client.HTTPConnection('https://wooohooo-indexquery-wooohooo.app.secoder.net/', 80, timeout=30)
             httpClient.request('GET', f'/queryNews?name={query}&page={page}&number={number}')
@@ -99,6 +112,7 @@ def search(request):
         finally:
             if httpClient:
                 httpClient.close()
+        '''
         newslist = [{
             'uid': i,
             'link': "https://www.baidu.com",
@@ -108,6 +122,7 @@ def search(request):
             'source': "xinhua net",
             'time': "2020.1.1",
         } for i in range(number)]
+<<<<<<< HEAD
 >>>>>>> ab11485 (update:add the code that enable the Django-backend to connect to the java-backend)
 =======
         try:
@@ -125,6 +140,9 @@ def search(request):
                 'time': "2020.1.1",
             } for i in range(number)]
 >>>>>>> 16f72b5 (fix: use requests to fetch lucene data)
+=======
+        '''
+>>>>>>> 82bd108 (fix:fix the get request)
         return JsonResponse({
             'code': 200,
             'data': newslist,
