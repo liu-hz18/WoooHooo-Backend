@@ -51,16 +51,22 @@ def search(request):
         page = 0
         number = 0
         query = ""
-        print(request.body.decode())
-        page = int(request.GET.get('page', default=0))
-        number = int(request.GET.get('number', default=10))
-        query = request.GET.get('query', default="")
+        for k,v in request.GET.items():
+            print(k)
+            print(v)
+            if k == "page":
+                page = v
+            elif k == "number":
+                number = v
+            elif k == "query":
+                query = v
         keywords = sorted(jieba.lcut_for_search(query), key=len, reverse=True)
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
         total = 1000
         #向java端发送检索请求
+        newslist = None
         try:
             httpClient = http.client.HTTPConnection('https://wooohooo-indexquery-wooohooo.app.secoder.net/', 80, timeout=30)
             httpClient.request('GET', f'/queryNews?name={query}&page={page}&number={number}')
@@ -73,6 +79,7 @@ def search(request):
         finally:
             if httpClient:
                 httpClient.close()
+        '''
         newslist = [{
             'uid': i,
             'link': "https://www.baidu.com",
@@ -82,6 +89,7 @@ def search(request):
             'source': "xinhua net",
             'time': "2020.1.1",
         } for i in range(number)]
+        '''
         return JsonResponse({
             'code': 200,
             'data': newslist,
