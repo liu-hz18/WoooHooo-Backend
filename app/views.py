@@ -78,6 +78,7 @@ def search(request):
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
 <<<<<<< HEAD
+<<<<<<< HEAD
         try:
             total, newslist = fetch_search_result(query, number, page)
         except Exception as e:
@@ -108,6 +109,22 @@ def search(request):
             'time': "2020.1.1",
         } for i in range(number)]
 >>>>>>> ab11485 (update:add the code that enable the Django-backend to connect to the java-backend)
+=======
+        try:
+            total, newslist = fetch_search_result(query, number, page)
+        except Exception as e:
+            print("error in search():", e)
+            total = 1000
+            newslist = [{
+                'uid': i,
+                'link': "https://www.baidu.com",
+                'title': f" This is a random news from backend {query} {i+page*number} "  * 10,
+                'content': "这是新闻内容，" * 20,
+                'imgurl': "http://inews.gtimg.com/newsapp_ls/0/12576682689_640330/0" if randint(0, 1) else "",
+                'source': "xinhua net",
+                'time': "2020.1.1",
+            } for i in range(number)]
+>>>>>>> 16f72b5 (fix: use requests to fetch lucene data)
         return JsonResponse({
             'code': 200,
             'data': newslist,
