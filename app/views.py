@@ -108,6 +108,7 @@ def search(request):
         page, number = int(page), int(number)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         total, newslist = fetch_typed_news(news_type, number, page)
 =======
 =======
@@ -123,6 +124,9 @@ def search(request):
             'time': "2020.1.1",
         } for i in range(number)]
 >>>>>>> 4b9f76e (upd: keyword cut will be sorted by length)
+=======
+        total, newslist = fetch_typed_news(news_type, number, page)
+>>>>>>> f48baab (add: news type fetch api from newsdb)
         return JsonResponse({
             'code': 200,
             'data': newslist,
