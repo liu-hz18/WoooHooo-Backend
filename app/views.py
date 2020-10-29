@@ -68,7 +68,7 @@ def search(request):
             response = httpClient.getresponse()
             print(response.read().decode())
             newslist = response.read().decode()
-        except Exception as e:
+        except ConnectionRefusedError as e:
             print(e)
         finally:
             if httpClient:
