@@ -81,7 +81,7 @@ def fetch_search_result(query, number, page):
     ) as server:
         newsdb_client = pymongo.MongoClient(f"mongodb://localhost:{local_port}/")
         newsdb = newsdb_client[database_name]
-        news_col = newsdb[type_map[news_type]]
+        news_col = newsdb["news"]
         print(news_col)
         query = {}
         ret_field = { # 为1的字段会返回

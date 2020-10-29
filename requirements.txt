@@ -1,2 +1,4 @@
-jieba==0.42.1
 Django==3.1.2
+jieba==0.42.1
+sshtunnel==0.2.1
+pymongo==3.11.0
