@@ -1,5 +1,10 @@
 """ app/views.py """
 import json
+<<<<<<< HEAD
+=======
+import http.client 
+from random import randint
+>>>>>>> 8bccdc2 (update:add the code that enable the Django-backend to connect to the java-backend)
 import jieba
 from django.http.response import JsonResponse
 from django.shortcuts import HttpResponse
@@ -72,11 +77,37 @@ def search(request):
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
+<<<<<<< HEAD
         try:
             total, newslist = fetch_search_result(query, number, page)
         except Exception as e:
             total, newslist = 0, []
             print("error in search():", e)
+=======
+        total = 1000
+        #向java端发送检索请求
+        try:
+            httpClient = http.client.HTTPConnection('https://wooohooo-indexquery-wooohooo.app.secoder.net/', 80, timeout=30)
+            httpClient.request('GET', f'/queryNews?name={query}&page={page}&number={number}')
+            #response是HTTPResponse对象
+            response = httpClient.getresponse()
+            print(response.read().decode())
+            newslist = response.read().decode()
+        except ConnectionRefusedError as e:
+            print(e)
+        finally:
+            if httpClient:
+                httpClient.close()
+        newslist = [{
+            'uid': i,
+            'link': "https://www.baidu.com",
+            'title': f" This is a random news from backend {query} {i+page*number} "  * 10,
+            'content': "这是新闻内容，" * 20,
+            'imgurl': "http://inews.gtimg.com/newsapp_ls/0/12576682689_640330/0" if randint(0, 1) else "",
+            'source': "xinhua net",
+            'time': "2020.1.1",
+        } for i in range(number)]
+>>>>>>> ab11485 (update:add the code that enable the Django-backend to connect to the java-backend)
         return JsonResponse({
             'code': 200,
             'data': newslist,
