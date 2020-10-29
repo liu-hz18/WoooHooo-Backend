@@ -59,6 +59,19 @@ def search(request):
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
         total = 1000
+        #向java端发送检索请求
+        try:
+            httpClient = http.client.HTTPConnection('https://wooohooo-indexquery-wooohooo.app.secoder.net/', 80, timeout=30)
+            httpClient.request('GET', f'/queryNews?name={query}&page={page}&number={number}')
+            #response是HTTPResponse对象
+            response = httpClient.getresponse()
+            print(response.read().decode())
+            newslist = response.read().decode()
+        except Exception as e:
+            print(e)
+        finally:
+            if httpClient:
+                httpClient.close()
         newslist = [{
             'uid': i,
             'link': "https://www.baidu.com",
