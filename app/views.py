@@ -1,10 +1,13 @@
 """ app/views.py """
 import json
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import http.client 
 from random import randint
 >>>>>>> 8bccdc2 (update:add the code that enable the Django-backend to connect to the java-backend)
+=======
+>>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
 import jieba
 from django.http.response import JsonResponse
 from django.shortcuts import HttpResponse
@@ -52,6 +55,7 @@ def search(request):
     if request.method == "GET":
         keywords = []
 <<<<<<< HEAD
+<<<<<<< HEAD
         page = int(request.GET.get('page', default=0))
         number = int(request.GET.get('number', default=10))
         query = request.GET.get('query', default="")
@@ -84,11 +88,17 @@ def search(request):
             elif k == "query":
                 query = v
 >>>>>>> 82bd108 (fix:fix the get request)
+=======
+        page = int(request.GET.get('page', default=0))
+        number = int(request.GET.get('number', default=10))
+        query = request.GET.get('query', default="")
+>>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
         keywords = sorted(jieba.lcut_for_search(query), key=len, reverse=True)
 >>>>>>> 4b9f76e (upd: keyword cut will be sorted by length)
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         try:
@@ -125,10 +135,14 @@ def search(request):
 <<<<<<< HEAD
 >>>>>>> ab11485 (update:add the code that enable the Django-backend to connect to the java-backend)
 =======
+=======
+>>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
         try:
             total, newslist = fetch_search_result(query, number, page)
         except Exception as e:
+            total, newslist = 0, []
             print("error in search():", e)
+<<<<<<< HEAD
             total = 1000
             newslist = [{
                 'uid': i,
@@ -143,6 +157,8 @@ def search(request):
 =======
         '''
 >>>>>>> 82bd108 (fix:fix the get request)
+=======
+>>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
         return JsonResponse({
             'code': 200,
             'data': newslist,

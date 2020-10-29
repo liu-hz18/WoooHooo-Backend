@@ -1,12 +1,17 @@
 # coding:utf-8
 <<<<<<< HEAD
+<<<<<<< HEAD
 import json
 import requests
 =======
 >>>>>>> 16f72b5 (fix: use requests to fetch lucene data)
 import pymongo
 import requests
+=======
+>>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
 import json
+import requests
+import pymongo
 from sshtunnel import SSHTunnelForwarder
 
 host = "49.233.52.61"
@@ -82,6 +87,7 @@ def fetch_typed_news(news_type, number, page):
         total = news_col.count()
         for x in news_col.find(query, ret_field).skip(page*number).limit(number):  # 注意限制个数，不然数据量可能极大
 <<<<<<< HEAD
+<<<<<<< HEAD
             result.append(decode(x))
 =======
             if len(x["top_img"]) > 0:
@@ -100,6 +106,9 @@ def fetch_typed_news(news_type, number, page):
                 "time": x["publish_time"]
             })
 >>>>>>> 16f72b5 (fix: use requests to fetch lucene data)
+=======
+            result.append(decode(x))
+>>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
         newsdb_client.close()
         print("**** exit from server ****")
     return total, result
@@ -115,6 +124,7 @@ def fetch_search_result(query, number, page):
             "page": page,
             "number": number
         }
+<<<<<<< HEAD
 <<<<<<< HEAD
         response = requests.get(url=lucene_url, params=params)
         newslist = json.loads(response.text)
@@ -143,6 +153,12 @@ def fetch_search_result(query, number, page):
                 "time": x["publish_time"]
             })
 >>>>>>> 16f72b5 (fix: use requests to fetch lucene data)
+=======
+        response = requests.get(url=lucene_url, params=params)
+        newslist = json.loads(response.text)
+        for x in newslist:
+            result.append(decode(x))
+>>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
     except Exception as e:
         print("error:", e)
     return total, result
