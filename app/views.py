@@ -223,5 +223,9 @@ def search(request):
             'keywords': [],
 >>>>>>> b3f5e91 (upd: provide keywords field in news type return)
             'total': total,
+<<<<<<< HEAD
         })
 >>>>>>> ee3216d (upd: add 	otal param in news type api)
+=======
+        }, status=200)
+>>>>>>> c88a084 (feat: provide user email validation api #9)

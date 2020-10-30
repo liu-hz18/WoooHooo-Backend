@@ -153,10 +153,6 @@ disable=print-statement,
         too-many-boolean-expressions,
         unused-variable,
         broad-except
-<<<<<<< HEAD
-=======
-        
->>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

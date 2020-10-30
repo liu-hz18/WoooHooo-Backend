@@ -1,13 +1,5 @@
-<<<<<<< HEAD
 Django==3.1.2
 pymongo==3.11.0
 yagmail==0.14.245
 requests==2.22.0
 sshtunnel==0.2.1
-=======
-sshtunnel==0.2.1
-jieba==0.42.1
-pymongo==3.11.0
-requests==2.22.0
-Django==3.1.2
->>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
