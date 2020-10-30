@@ -1,14 +1,4 @@
 # coding:utf-8
-<<<<<<< HEAD
-<<<<<<< HEAD
-import json
-import requests
-=======
->>>>>>> 16f72b5 (fix: use requests to fetch lucene data)
-import pymongo
-import requests
-=======
->>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
 import json
 import requests
 import pymongo
@@ -86,29 +76,7 @@ def fetch_typed_news(news_type, number, page):
         }
         total = news_col.count()
         for x in news_col.find(query, ret_field).skip(page*number).limit(number):  # 注意限制个数，不然数据量可能极大
-<<<<<<< HEAD
-<<<<<<< HEAD
             result.append(decode(x))
-=======
-            if len(x["top_img"]) > 0:
-                img_url = "http:" + x["top_img"]
-            elif len(x["imageurl"]) > 0:
-                img_url = "http:" + x["imageurl"][0]
-            else:
-                img_url = ""
-            result.append({
-                "uid": str(x['_id']),
-                "link": x["url"],
-                "title": x["title"],
-                "content": x["content"][:300],
-                "imgurl": img_url,
-                "source": x["source"],
-                "time": x["publish_time"]
-            })
->>>>>>> 16f72b5 (fix: use requests to fetch lucene data)
-=======
-            result.append(decode(x))
->>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
         newsdb_client.close()
         print("**** exit from server ****")
     return total, result
@@ -124,41 +92,10 @@ def fetch_search_result(query, number, page):
             "page": page,
             "number": number
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
         response = requests.get(url=lucene_url, params=params)
         newslist = json.loads(response.text)
         for x in newslist:
             result.append(decode(x))
-=======
-        url = "https://wooohooo-indexquery-wooohooo.app.secoder.net/queryNews"
-        response = requests.get(url=url, params=params)
-        newslist = json.loads(response.text)
-        for x in newslist:
-            if x["top_img"] and len(x["top_img"]) > 5:
-                img_url = "http:" + x["top_img"]
-            else:
-                imgs = json.loads(x["imageurl"])
-                if len(imgs) > 0:
-                    img_url = "http:" + imgs[0]
-                else:
-                    img_url = ""
-            result.append({
-                "uid": str(x['_id']),
-                "link": x["url"],
-                "title": x["title"],
-                "content": x["content"][:300],
-                "imgurl": img_url,
-                "source": x["source"],
-                "time": x["publish_time"]
-            })
->>>>>>> 16f72b5 (fix: use requests to fetch lucene data)
-=======
-        response = requests.get(url=lucene_url, params=params)
-        newslist = json.loads(response.text)
-        for x in newslist:
-            result.append(decode(x))
->>>>>>> 173e6d1 (fix: finish backend request to lucene #3 #4)
     except Exception as e:
         print("error:", e)
     return total, result
