@@ -24,3 +24,4 @@ xunit-reports/
 **/.DS_Store
 .idea
 .vscode
+simulate.sh
