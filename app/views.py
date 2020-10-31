@@ -1,7 +1,5 @@
 """ app/views.py """
 import json
-import http.client 
-from random import randint
 import jieba
 from django.http.response import JsonResponse
 from django.shortcuts import HttpResponse
@@ -45,57 +43,27 @@ def search(request):
             'data': data,
             'keywords': keywords,
             'total': 0,
-        })
+        }, status=code)
     if request.method == "GET":
         keywords = []
-        page = 0
-        number = 0
-        query = ""
-        for k,v in request.GET.items():
-            print(k)
-            print(v)
-            if k == "page":
-                page = v
-            elif k == "number":
-                number = v
-            elif k == "query":
-                query = v
+        page = int(request.GET.get('page', default=0))
+        number = int(request.GET.get('number', default=10))
+        query = request.GET.get('query', default="")
         keywords = sorted(jieba.lcut_for_search(query), key=len, reverse=True)
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
-        total = 1000
-        #向java端发送检索请求
-        newslist = None
         try:
-            httpClient = http.client.HTTPConnection('https://wooohooo-indexquery-wooohooo.app.secoder.net/', 80, timeout=30)
-            httpClient.request('GET', f'/queryNews?name={query}&page={page}&number={number}')
-            #response是HTTPResponse对象
-            response = httpClient.getresponse()
-            print(response.read().decode())
-            newslist = response.read().decode()
-        except ConnectionRefusedError as e:
-            print(e)
-        finally:
-            if httpClient:
-                httpClient.close()
-        '''
-        newslist = [{
-            'uid': i,
-            'link': "https://www.baidu.com",
-            'title': f" This is a random news from backend {query} {i+page*number} "  * 10,
-            'content': "这是新闻内容，" * 20,
-            'imgurl': "http://inews.gtimg.com/newsapp_ls/0/12576682689_640330/0" if randint(0, 1) else "",
-            'source': "xinhua net",
-            'time': "2020.1.1",
-        } for i in range(number)]
-        '''
+            total, newslist = fetch_search_result(query, number, page)
+        except Exception as e:
+            total, newslist = 0, []
+            print("error in search():", e)
         return JsonResponse({
             'code': 200,
             'data': newslist,
             'keywords': keywords,
             'total': total
-        })
+        }, status=200)
     elif request.method == "POST":
         print(request.body.decode())
         json_obj = json.loads(request.body.decode())
@@ -112,4 +80,4 @@ def search(request):
             'data': newslist,
             'keywords': [],
             'total': total,
-        })
+        }, status=200)
