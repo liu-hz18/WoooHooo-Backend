@@ -17,22 +17,6 @@ def gen_response(code: int, data: str):
 def login(request):
     #Get用来验证登录
     if request.method == 'GET':
-<<<<<<< HEAD
-        username = ""
-        password = ""
-        for k,v in request.GET.items():
-            print(k)
-            print(v)
-            if k == "username":
-                username = v
-            elif k == "userpass":
-                password = v
-                print(password)
-        #如果前端没传过来用户名和密码
-        if password == "" or username == "":
-            return gen_response(405, "there is no username or password")
-        print(username)
-=======
         print(request.GET.items())
         username = request.GET.get('username', default="")
         password = request.GET.get('userpass', default="")
@@ -40,7 +24,6 @@ def login(request):
         #如果前端没传过来用户名和密码
         if password == "" or username == "":
             return gen_response(405, "there is no username or password or None")
->>>>>>> d760063463e054007a368699cd73621c84882dce
         #利用用户名获取用户
         user = User.objects.filter(name=username).first()
         #若用户不存在
@@ -52,10 +35,7 @@ def login(request):
         return gen_response(401, "password Error")
     #用Post来完成注册
     elif request.method == 'POST':
-<<<<<<< HEAD
-=======
         print(request.body.decode())
->>>>>>> d760063463e054007a368699cd73621c84882dce
         try:
             user = json.loads(request.body.decode())
         except json.JSONDecodeError:
@@ -64,26 +44,15 @@ def login(request):
         password = user.get('userpass')
         if not username or not password:
             return gen_response(400, "there is no username or password")
-<<<<<<< HEAD
-        #检查用户是否已经存在
-=======
         # 检查用户是否已经存在
->>>>>>> d760063463e054007a368699cd73621c84882dce
         user = User.objects.filter(name=username).first()
         if user:
             return gen_response(401, "user is already existed")
         user = User(name=username,password=password)
         print(user)
         try:
-<<<<<<< HEAD
-            #检查用户名的有效性
-            user.full_clean()
-            # 存入数据库
-            user.save()
-=======
             user.full_clean() #检查用户名的有效性
             user.save() # 存入数据库
->>>>>>> d760063463e054007a368699cd73621c84882dce
             return gen_response(200, "user was set successfully")
         except ValidationError as e:
             return gen_response(400, "length Error of user: {}".format(e))
