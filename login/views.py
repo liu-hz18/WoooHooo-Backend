@@ -73,7 +73,7 @@ def validate(request):
             return gen_response(400, "mail address or username error")
         key = send_validation_email(username, mail_addr)
         print("validation key: ", key)
-        if key < 0:
+        if key == "-1":
             return gen_response(400, "mail address format error")
         return gen_response(200, key)
     else:

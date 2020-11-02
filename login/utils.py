@@ -1,5 +1,6 @@
 import time
 import random
+import hashlib
 import yagmail
 from yagmail.error import YagInvalidEmailAddress, YagConnectionClosed, YagAddressError
 
@@ -36,6 +37,11 @@ base_contents = '''
 <div><includetail><!--<![endif]--></includetail></div>
 ''' #使用 ''' 嵌入HTML代码，使用 format 嵌入称呼(ss)与验证码(key)
 
+def md5(number):
+    obj = hashlib.md5() # 加盐hash
+    obj.update(str(number).encode('utf-8'))
+    hash_key = obj.hexdigest()
+    return hash_key
 
 def send_validation_email(username, email_addr):
     key = random.randint(100000, 999999)
@@ -45,5 +51,6 @@ def send_validation_email(username, email_addr):
         yag.send(email_addr, subject, contents)
     except (YagInvalidEmailAddress, YagConnectionClosed, YagAddressError) as e:
         print("error: ", e)
-        return -1
-    return key
+        return "-1"
+    hash_key = md5(key)
+    return hash_key
