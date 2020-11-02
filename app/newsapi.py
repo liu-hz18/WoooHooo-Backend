@@ -34,7 +34,7 @@ def decode(news):
     if news["top_img"] and len(news["top_img"]) > 5:
         img_url = http_prefix + news["top_img"]
     else:
-        imgs = json.loads(news["imageurl"])
+        imgs = news["imageurl"]
         if len(imgs) > 0:
             img_url = http_prefix + imgs[0]
         else:
@@ -75,7 +75,9 @@ def fetch_typed_news(news_type, number, page):
             "top_img": 1,
         }
         total = news_col.count()
+        print(total, page, number)
         for x in news_col.find(query, ret_field).skip(page*number).limit(number):  # 注意限制个数，不然数据量可能极大
+            #print(x)
             result.append(decode(x))
         newsdb_client.close()
         print("**** exit from server ****")
