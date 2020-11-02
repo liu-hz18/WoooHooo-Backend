@@ -93,7 +93,10 @@ def fetch_search_result(query, number, page):
             "number": number
         }
         response = requests.get(url=lucene_url, params=params)
-        newslist = json.loads(response.text)
+        search_result_json = json.loads(response.text)
+        total = search_result_json["total"]
+        newslist = search_result_json["data"]
+        # print(newslist)
         for x in newslist:
             result.append(decode(x))
     except Exception as e:
