@@ -3,7 +3,7 @@ import json
 import requests
 from django.test import TestCase, Client
 
-from .models import User
+from .models import User, BrowseHistory, SearchHistory
 from .views import gen_response
 
 CONTENT_TYPE = "application/json"
@@ -14,16 +14,16 @@ class APITest(TestCase):
     def setUp(self):
         self.check_user_signup("test", "123456", 200, "user was set successfully")
 
-    def check_user_login(self, name, password, code, content):
+    def check_user_login(self, name, passw, code, content):
         client = Client()
-        response = client.get(f"/api/login?username={name}&userpass={password}")
+        response = client.get(f"/api/login?username={name}&userpass={passw}")
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], code)
         self.assertEqual(response_json["data"], content)
 
-    def check_user_signup(self, name, password, code, content):
+    def check_user_signup(self, name, passw, code, content):
         client = Client()
-        response = client.post("/api/login", data={"username": name, "userpass": password}, content_type=CONTENT_TYPE)
+        response = client.post("/api/login", data={"username": name, "userpass": passw}, content_type=CONTENT_TYPE)
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], code)
         self.assertEqual(response_json["data"], content)
@@ -90,3 +90,137 @@ class UserTestCase(TestCase):
         self.assertEqual(cat.password, '654321')
         self.assertEqual(str(lion), "lion")
         self.assertEqual(str(cat), "cat")
+
+
+class SearchHistoryTest(TestCase):
+    def setUp(self):
+        User.objects.create(name="test", password="123456")
+        User.objects.create(name="test_his", password="654321")
+        user = User.objects.filter(name="test").first()
+        SearchHistory.objects.create(user=user, content="test content1")
+        SearchHistory.objects.create(user=user, content="test content2")
+
+    def test_add_history(self):
+        search_log_url = "/api/searchhis"
+        client = Client()
+        response = client.post(search_log_url, data={"username": "test_his", "data": "新闻"}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(response_json["data"], "searching history logged successfully")
+        
+        response = client.post(search_log_url, data={"username": "test_his"}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "username or search content is None!")
+
+        response = client.post(search_log_url, data={"username": "test_his1", "data": "新闻"}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "username don't exist.")
+
+        response = client.post(search_log_url, data={"username": "test_his", "data": "a"*200}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "search content length is too long")
+
+        response = client.post(search_log_url, data="{123", content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "the data is not json")
+
+    def test_read_history(self):
+        client = Client()
+        response = client.get("/api/searchhis?username=test")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(response_json["data"], ["test content1", "test content2"])
+        self.assertEqual(int(response_json["total"]), 2)
+
+        response = client.get("/api/searchhis")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "user name should not be None or blank")
+
+
+class BrowseHistoryTest(TestCase):
+    def setUp(self):
+        User.objects.create(name="test", password="123456")
+        User.objects.create(name="test_his", password="654321")
+        user = User.objects.filter(name="test").first()
+        BrowseHistory.objects.create(
+            user=user, uid="123456", title="test title1", imgurl="",
+            link="", source="", time="", content=""
+
+        )
+        BrowseHistory.objects.create(
+            user=user, uid="654321", title="test title2", imgurl="",
+            link="", source="", time="", content=""
+        )
+
+    def test_add_history(self):
+        browse_log_url = "/api/browsehis"
+        newsinfo = {'uid': "123", 'title': "This is a content", 'content': "1", 'imgurl': "1", 'source': "1", 'time': "1", 'link': "1"}
+        client = Client()
+        response = client.post(browse_log_url, data={"username": "test_his", "newsinfo": newsinfo}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(response_json["data"], "browsing history logged successfully")
+
+        newsinfo["uid"] = "321"
+        response = client.post(browse_log_url, data={"username": "test_his", "newsinfo": json.dumps(newsinfo)}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(response_json["data"], "browsing history logged successfully")
+        
+        newsinfo1 = {"uid": "123", "title": "This is a content", "content": "a"*500, "imgurl": "1", "source": "1", "time": "1", "link": "1"}
+        response = client.post(browse_log_url, data={"username": "test_his", "newsinfo": newsinfo1}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "news info length is too long")
+
+        response = client.post(browse_log_url, data={"username": "test_his"}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "username or newsinfo is None!")
+
+        response = client.post(browse_log_url, data={"username": "test_his1", "newsinfo": newsinfo}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "username don't exist.")
+
+        response = client.post(browse_log_url, data="{123", content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "the data is not json") 
+
+    def test_read_history(self):
+        client = Client()
+        response = client.get("/api/browsehis?username=test")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(response_json["data"], [
+            {
+                "uid": "123456",
+                "title": "test title1",
+                "imgurl": "",
+                "content": "",
+                "link": "",
+                "source": "",
+                "time": "",
+            },
+            {
+                "uid": "654321",
+                "title": "test title2",
+                "imgurl": "",
+                "content": "",
+                "link": "",
+                "source": "",
+                "time": "",
+            },
+        ])
+        self.assertEqual(int(response_json["total"]), 2)
+
+        response = client.get("/api/browsehis")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "user name should not be None or blank")

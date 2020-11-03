@@ -7,3 +7,20 @@ class User(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class SearchHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.CharField(unique=True, max_length=100)
+
+
+class BrowseHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # 外键指向User的主键, 跟随外键删除
+    uid = models.CharField(unique=True, max_length=50)
+    title = models.CharField(max_length=100)
+    content = models.CharField(max_length=350)
+    imgurl = models.CharField(max_length=100)
+    link = models.CharField(max_length=100)
+    source = models.CharField(max_length=50)
+    time = models.CharField(max_length=50)
+    browse_time = models.DateTimeField(auto_now_add=True)
