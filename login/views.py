@@ -23,7 +23,7 @@ def login(request):
         print("username: ", username, "password: ", password)
         #如果前端没传过来用户名和密码
         if password == "" or username == "":
-            return gen_response(405, "there is no username or password or None")
+            return gen_response(400, "there is no username or password or None")
         #利用用户名获取用户
         user = User.objects.filter(name=username).first()
         #若用户不存在
@@ -32,14 +32,14 @@ def login(request):
         #检查密码
         if user.password == password:
             return gen_response(200, "successful user validation")
-        return gen_response(401, "password Error")
+        return gen_response(400, "password Error")
     #用Post来完成注册
     elif request.method == 'POST':
         print(request.body.decode())
         try:
             user = json.loads(request.body.decode())
         except json.JSONDecodeError:
-            return gen_response(403 , "the data is not json")
+            return gen_response(400 , "the data is not json")
         username = user.get('username')
         password = user.get('userpass')
         if not username or not password:
@@ -47,7 +47,7 @@ def login(request):
         # 检查用户是否已经存在
         user = User.objects.filter(name=username).first()
         if user:
-            return gen_response(401, "user is already existed")
+            return gen_response(400, "user is already existed")
         user = User(name=username,password=password)
         print(user)
         try:
@@ -55,9 +55,7 @@ def login(request):
             user.save() # 存入数据库
             return gen_response(200, "user was set successfully")
         except ValidationError as e:
-            return gen_response(400, "length Error of user: {}".format(e))
-    else:
-        return gen_response(400, "Unknown Error")
+            return gen_response(400, "DB Error of user: {}".format(e))
 
 
 def validate(request):
@@ -66,7 +64,7 @@ def validate(request):
         try:
             mail_json = json.loads(request.body.decode())
         except json.JSONDecodeError:
-            return gen_response(403 , "the data is not json")
+            return gen_response(400 , "the data is not json")
         username = mail_json.get('username')
         mail_addr = mail_json.get("mail")
         if not mail_addr or not username or username == "":
