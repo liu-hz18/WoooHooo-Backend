@@ -35,6 +35,8 @@ def decode(news):
         img_url = http_prefix + news["top_img"]
     else:
         imgs = news["imageurl"]
+        if isinstance(imgs, str):
+            imgs = json.loads(imgs)
         if len(imgs) > 0:
             img_url = http_prefix + imgs[0]
         else:
@@ -84,23 +86,21 @@ def fetch_typed_news(news_type, number, page):
     return total, result
 
 
-def fetch_search_result(query, number, page):
+def fetch_search_result(query, number, page, relation=1):
     total = 1000
     result = []
     #向java端发送检索请求
-    try:
-        params = {
-            "name": query,
-            "page": page,
-            "number": number
-        }
-        response = requests.get(url=lucene_url, params=params)
-        search_result_json = json.loads(response.text)
-        total = search_result_json["total"]
-        newslist = search_result_json["data"]
-        # print(newslist)
-        for x in newslist:
-            result.append(decode(x))
-    except Exception as e:
-        print("error:", e)
+    params = {
+        "name": query,
+        "page": page,
+        "number": number,
+        "relation": relation
+    }
+    response = requests.get(url=lucene_url, params=params)
+    search_result_json = json.loads(response.text)
+    total = search_result_json["total"]
+    newslist = search_result_json["data"]
+    # print(newslist)
+    for x in newslist:
+        result.append(decode(x))
     return total, result
