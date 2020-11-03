@@ -62,7 +62,6 @@ def search(request):
             'total': total
         }, status=200)
     elif request.method == "POST":
-        print(request.body)
         print(request.body.decode())
         json_obj = json.loads(request.body.decode())
         page = json_obj.get('page')
