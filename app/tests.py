@@ -8,19 +8,6 @@ from .apps import AppLocalConfig
 from .views import gen_bad_response
 from .newsapi import decode, io_db
 
-host = "49.233.52.61"
-port = 22
-# better changed to SSH
-username = "ubuntu"
-password = "48*~VbNY93Aq"
-database_name = "StaticNews"
-db_port = 27017
-local_port = 27018 # should be different from `db_port`
-colomn_name = "news"
-http_prefix = "http:"
-lucene_url = "https://wooohooo-indexquery-wooohooo.app.secoder.net/queryNews"
-
-
 # Create your tests here.
 class APITest(TestCase):
     """Main Test"""
@@ -78,4 +65,6 @@ class APITest(TestCase):
 
     def test_decode(self):
         news_ret = decode({"_id": 0, "url": "", "content": "", "source": "", "publish_time": "", "title": "", "top_img": "//www.baidu.com", "imageurl": str(["//www.baidu.com", "//www.baidu.com"])})
+        self.assertEqual(news_ret["imgurl"], "http://www.baidu.com")
+        news_ret = decode({"_id": 0, "url": "", "content": "", "source": "", "publish_time": "", "title": "", "top_img": "//www.baidu.com", "imageurl": ["//www.baidu.com", "//www.baidu.com"]})
         self.assertEqual(news_ret["imgurl"], "http://www.baidu.com")
