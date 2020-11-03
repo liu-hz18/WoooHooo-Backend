@@ -6,7 +6,20 @@ from django.test import TestCase, Client
 
 from .apps import AppLocalConfig
 from .views import gen_bad_response
-from .newsapi import decode
+from .newsapi import decode, io_db
+
+host = "49.233.52.61"
+port = 22
+# better changed to SSH
+username = "ubuntu"
+password = "48*~VbNY93Aq"
+database_name = "StaticNews"
+db_port = 27017
+local_port = 27018 # should be different from `db_port`
+colomn_name = "news"
+http_prefix = "http:"
+lucene_url = "https://wooohooo-indexquery-wooohooo.app.secoder.net/queryNews"
+
 
 # Create your tests here.
 class APITest(TestCase):
@@ -40,18 +53,19 @@ class APITest(TestCase):
         self.assertEqual(response_json["code"], 400)
 
     def test_typenews_api(self):
-        number = random.randint(1, 30)
-        page = random.randint(0, 10)
+        number = 0
+        page = 0
         client = Client()
-        response = client.post("/api/search", data={"page": page, "number": number, "newstype": "热点"}, content_type="application/json")
-        response_json = json.loads(response.content)
-        self.assertEqual(response_json["code"], 200)
-        self.assertEqual(len(response_json["data"]), number)
-        self.check_news_json_ok(response_json["data"][0])
         page = -1
         response = client.post("/api/search", data={"page": page, "number": number, "newstype": "热点"}, content_type="application/json")
         response_json = response.json()
         self.assertEqual(response_json["code"], 400)
+        page = 0
+        number = 100
+        response = client.post("/api/search", data={"page": page, "number": number, "newstype": "国内"}, content_type="application/json")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(len(response_json["data"]), 0)
 
     def test_app_config(self):
         self.assertEqual(AppLocalConfig.name, 'app')

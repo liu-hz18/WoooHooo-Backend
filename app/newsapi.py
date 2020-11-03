@@ -51,6 +51,12 @@ def decode(news):
         "time": news["publish_time"]
     }
 
+def io_db(news_col, query, ret_field, begin, number):
+    result, total = [], news_col.count()
+    for x in news_col.find(query, ret_field).skip(begin).limit(number):  # 注意限制个数，不然数据量可能极大
+        result.append(decode(x))
+    return total, result
+
 def fetch_typed_news(news_type, number, page):
     total = 0
     result = []
@@ -76,18 +82,16 @@ def fetch_typed_news(news_type, number, page):
             'content': 1,
             "top_img": 1,
         }
-        total = news_col.count()
         print(total, page, number)
-        for x in news_col.find(query, ret_field).skip(page*number).limit(number):  # 注意限制个数，不然数据量可能极大
-            #print(x)
-            result.append(decode(x))
+        if number < 100:
+            total, result = io_db(news_col, query, ret_field, page*number, number)
         newsdb_client.close()
-        print("**** exit from server ****")
+        server.close()
+    print("**** exit from server ****")
     return total, result
 
 
 def fetch_search_result(query, number, page, relation=1):
-    total = 1000
     result = []
     #向java端发送检索请求
     params = {
