@@ -9,4 +9,5 @@ urlpatterns = [
     path('browsehis', views.browsehis, name='browsehis'),
     path('searchhis', views.searchhis, name='searchhis'),
     path('recommend', views.recommend, name='recommend'),
+    path('user', views.user, name="user"),
 ]

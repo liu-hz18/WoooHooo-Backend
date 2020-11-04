@@ -4,7 +4,8 @@ from django.forms import ModelForm
 class User(models.Model):
     name = models.CharField(unique=True, max_length=100) # 用户名
     pwhash = models.CharField(max_length=200) # 密码
-
+    phone_number = models.CharField(max_length=20, default="") # phone
+    mail = models.CharField(max_length=50, default="") # mail
     def __str__(self):
         return self.name
 

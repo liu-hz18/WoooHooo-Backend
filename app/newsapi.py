@@ -9,7 +9,7 @@ port = 22
 # better changed to SSH
 username = "ubuntu"
 password = "48*~VbNY93Aq"
-database_name = "StaticNews"
+database_name = "NewsCopy"
 db_port = 27017
 local_port = 27018 # should be different from `db_port`
 colomn_name = "news"
@@ -53,7 +53,7 @@ def decode(news):
 
 def io_db(news_col, query, ret_field, begin, number):
     result, total = [], news_col.estimated_document_count()
-    for x in news_col.find(query, ret_field).skip(begin).limit(number):  # 注意限制个数，不然数据量可能极大
+    for x in news_col.find(query, ret_field).sort([("publish_time", pymongo.DESCENDING)]).skip(begin).limit(number):  # 注意限制个数，不然数据量可能极大
         result.append(decode(x))
     return total, result
 
