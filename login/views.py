@@ -47,19 +47,26 @@ def login(request):
             return gen_response(400, NOT_JSON_INFO)
         username = user.get('username')
         pwhash = user.get('userpass')
+        phone_number = user.get('phone')
+        mail = user.get('mail')
+        if not mail:
+            mail = "XXX@XXX.XXX"
+        if not phone_number:
+            phone_number = "XXX****XXXX"
         if not username or not pwhash:
             return gen_response(400, "there is no username or password")
         # 检查用户是否已经存在
         user = User.objects.filter(name=username).first()
         if user:
             return gen_response(400, "user is already existed")
-        user = User(name=username, pwhash=pwhash)
-        print(user)
+        user = User(name=username, pwhash=pwhash, phone_number=phone_number, mail=mail)
+        print(username, pwhash, phone_number, mail)
         try:
             user.full_clean() #检查用户名的有效性
             user.save() # 存入数据库
             return gen_response(200, "user was set successfully")
-        except ValidationError as _:
+        except ValidationError as e:
+            print(e)
             return gen_response(400, "user name is too long")
 
 
@@ -207,3 +214,16 @@ def recommend(request):
         })
     else:
         return gen_response(400, "POST method not supported, please use GET")
+
+
+def user(request):
+    if request.method == "GET":
+        name = request.GET.get('username', default="")
+        if not name or name == "":
+            return gen_response(400, USER_NAME_NONE)
+        user = User.objects.filter(name=name).first()
+        return JsonResponse({
+            "code": 200,
+            "phone": user.phone_number,
+            "mail": user.mail,
+        })

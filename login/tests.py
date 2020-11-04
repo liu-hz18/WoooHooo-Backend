@@ -259,3 +259,21 @@ class KeyWordTest(TestCase):
         user = User.objects.filter(name="test").first()
         keyword_list = extract_keywords("[][][]蚂蚁集团重新上市或被推迟半年, 新疆新增新冠肺炎确诊病例2例", user, topk=5)
         self.assertEqual(len(keyword_list), 5)
+
+
+class UserInfoTest(TestCase):
+    def setUp(self):
+        User.objects.create(name="test", pwhash="123456", mail="xxxx@qq.com", phone_number="123****4567")
+
+    def test_user_info(self):
+        client = Client()
+        response = client.get("/api/user?username=test")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(response_json["mail"], "xxxx@qq.com")
+        self.assertEqual(response_json["phone"], "123****4567")
+
+        response = client.get("/api/user")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], USER_NAME_NONE)
