@@ -8,4 +8,5 @@ urlpatterns = [
     path('validate', views.validate, name='validate'),
     path('browsehis', views.browsehis, name='browsehis'),
     path('searchhis', views.searchhis, name='searchhis'),
+    path('recommend', views.recommend, name='recommend'),
 ]

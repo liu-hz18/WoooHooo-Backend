@@ -3,10 +3,14 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.core.exceptions import ValidationError
 
-from .models import User, BrowseHistory, SearchHistory
-from .utils import send_validation_email
+from app.newsapi import fetch_search_result, fetch_typed_news
+
+from .models import User, BrowseHistory, SearchHistory, KeyWord
+from .utils import send_validation_email, extract_keywords
+
 
 NOT_JSON_INFO = "the data is not json"
+USER_NAME_NONE = "user name should not be None or blank"
 
 def gen_response(code: int, data: str):
     return JsonResponse({
@@ -20,10 +24,10 @@ def login(request):
     if request.method == 'GET':
         print(request.GET.items())
         username = request.GET.get('username', default="")
-        password = request.GET.get('userpass', default="")
-        print("username: ", username, "password: ", password)
+        pwhash = request.GET.get('userpass', default="")
+        print("username: ", username, "pwhash: ", pwhash)
         #如果前端没传过来用户名和密码
-        if password == "" or username == "":
+        if pwhash == "" or username == "":
             return gen_response(400, "there is no username or password or None")
         #利用用户名获取用户
         user = User.objects.filter(name=username).first()
@@ -31,7 +35,7 @@ def login(request):
         if not user:
             return gen_response(400, "username Error")
         #检查密码
-        if user.password == password:
+        if user.pwhash == pwhash:
             return gen_response(200, "successful user validation")
         return gen_response(400, "password Error")
     #用Post来完成注册
@@ -42,21 +46,21 @@ def login(request):
         except json.JSONDecodeError:
             return gen_response(400, NOT_JSON_INFO)
         username = user.get('username')
-        password = user.get('userpass')
-        if not username or not password:
+        pwhash = user.get('userpass')
+        if not username or not pwhash:
             return gen_response(400, "there is no username or password")
         # 检查用户是否已经存在
         user = User.objects.filter(name=username).first()
         if user:
             return gen_response(400, "user is already existed")
-        user = User(name=username, password=password)
+        user = User(name=username, pwhash=pwhash)
         print(user)
         try:
             user.full_clean() #检查用户名的有效性
             user.save() # 存入数据库
             return gen_response(200, "user was set successfully")
-        except ValidationError as e:
-            return gen_response(400, "DB Error of user: {}".format(e))
+        except ValidationError as _:
+            return gen_response(400, "user name is too long")
 
 
 def validate(request):
@@ -100,17 +104,18 @@ def browsehis(request):
             user=user, uid=news.get("uid"), title=news.get("title"), imgurl=news.get("imgurl"), 
             content=news.get("content"), link=news.get("link"), source=news.get("source"), time=news.get("time")
         )
-        print(browsing_history)
         try:
             browsing_history.full_clean()
             browsing_history.save()
         except ValidationError as _:
             return gen_response(400, 'news info length is too long')
+        # 保存用户浏览标题的关键词
+        KeyWord.objects.bulk_create(extract_keywords(news.get("title"), user, topk=5))  # 批量存储
         return gen_response(200, "browsing history logged successfully")
     elif request.method == "GET":
         name = request.GET.get('username', default="")
         if not name or name == "":
-            return gen_response(400, "user name should not be None or blank")
+            return gen_response(400, USER_NAME_NONE)
         user = User.objects.filter(name=name).first()
         result = []
         browse_his = user.browsehistory_set.all()
@@ -154,11 +159,13 @@ def searchhis(request):
             searching_history.save()
         except ValidationError as _:
             return gen_response(400, 'search content length is too long')
+        # 保存用户浏览标题的关键词
+        KeyWord.objects.bulk_create(extract_keywords(content, user, topk=5))  # 批量存储
         return gen_response(200, "searching history logged successfully")
     elif request.method == "GET":
         name = request.GET.get('username', default="")
         if not name or name == "":
-            return gen_response(400, "user name should not be None or blank")
+            return gen_response(400, USER_NAME_NONE)
         user = User.objects.filter(name=name).first()
         result = []
         search_his = user.searchhistory_set.all()
@@ -170,3 +177,33 @@ def searchhis(request):
             "data": result,
             "total": total,
         })
+
+
+def recommend(request):
+    if request.method == "GET":
+        name = request.GET.get('username', default="")
+        number = int(request.GET.get('number', default=10))
+        page = int(request.GET.get('page', default=0))
+        if not name or name == "":
+            return gen_response(400, USER_NAME_NONE)
+        user = User.objects.filter(name=name).first()
+        keyword_search = []
+        keywords = user.keyword_set.all()
+        num_keywords = len(keywords)
+        print(keywords, num_keywords)
+        if num_keywords > 1:
+            for keyword in keywords:
+                keyword_search.append(keyword.keyword)
+            to_search = " ".join(keyword_search)
+            print(to_search)
+            # 到lucene去检索
+            total, newslist = fetch_search_result(to_search, number, page, relation=1)
+        else: # 直接返回热点新闻
+            total, newslist = fetch_typed_news("热点", number, page)
+        return JsonResponse({
+            "code": 200,
+            "data": newslist,
+            "total": total,
+        })
+    else:
+        return gen_response(400, "POST method not supported, please use GET")

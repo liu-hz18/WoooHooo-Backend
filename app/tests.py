@@ -1,5 +1,4 @@
 """test"""
-import random
 import json
 import requests
 from django.test import TestCase, Client
@@ -7,6 +6,8 @@ from django.test import TestCase, Client
 from .apps import AppLocalConfig
 from .views import gen_bad_response
 from .newsapi import decode, io_db
+
+BAIDU_POSTFIX = "//www.baidu.com"
 
 # Create your tests here.
 class APITest(TestCase):
@@ -26,8 +27,8 @@ class APITest(TestCase):
         self.assertEqual(response.content, b"Hello world")
 
     def test_search_api(self):
-        number = random.randint(1, 30)
-        page = random.randint(0, 10)
+        number = 24
+        page = 1
         client = Client()
         response = client.get(f"/api/search?page={page}&number={number}&query=新闻")
         response_json = json.loads(response.content)
@@ -64,7 +65,7 @@ class APITest(TestCase):
         self.assertEqual(ret["keywords"], ["新闻"])
 
     def test_decode(self):
-        news_ret = decode({"_id": 0, "url": "", "content": "", "source": "", "publish_time": "", "title": "", "top_img": "//www.baidu.com", "imageurl": str(["//www.baidu.com", "//www.baidu.com"])})
-        self.assertEqual(news_ret["imgurl"], "http://www.baidu.com")
-        news_ret = decode({"_id": 0, "url": "", "content": "", "source": "", "publish_time": "", "title": "", "top_img": "//www.baidu.com", "imageurl": ["//www.baidu.com", "//www.baidu.com"]})
-        self.assertEqual(news_ret["imgurl"], "http://www.baidu.com")
+        news_ret = decode({"_id": 0, "url": "", "content": "", "source": "", "publish_time": "", "title": "", "top_img": "", "imageurl": json.dumps([BAIDU_POSTFIX, BAIDU_POSTFIX])})
+        self.assertEqual(news_ret["imgurl"], "http:" + BAIDU_POSTFIX)
+        news_ret = decode({"_id": 0, "url": "", "content": "", "source": "", "publish_time": "", "title": "", "top_img": BAIDU_POSTFIX, "imageurl": [BAIDU_POSTFIX, BAIDU_POSTFIX]})
+        self.assertEqual(news_ret["imgurl"], "http:" + BAIDU_POSTFIX)
