@@ -1,12 +1,14 @@
-import random
 import json
 import requests
 from django.test import TestCase, Client
 
-from .models import User, BrowseHistory, SearchHistory
+from .models import User, BrowseHistory, SearchHistory, KeyWord
 from .views import gen_response
+from .utils import extract_keywords
 
 CONTENT_TYPE = "application/json"
+NOT_JSON = "the data is not json"
+USER_NAME_NONE = "user name should not be None or blank"
 
 # Create your tests here.
 class APITest(TestCase):
@@ -42,11 +44,12 @@ class APITest(TestCase):
     def test_login_post(self):        
         self.check_user_signup("test", "654321", 400, "user is already existed")
         self.check_user_signup("test", None, 400, "there is no username or password")
+        self.check_user_signup("test"*100, "654321", 400, "user name is too long")
         client = Client()
         response = client.post("/api/login", data="{123", content_type=CONTENT_TYPE)
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 400)
-        self.assertEqual(response_json["data"], "the data is not json")
+        self.assertEqual(response_json["data"], NOT_JSON)
 
     def check_validate(self, name, mail, code, content):
         client = Client()
@@ -74,28 +77,28 @@ class APITest(TestCase):
         response = client.post(validate_url, data="{123", content_type=CONTENT_TYPE)
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 400)
-        self.assertEqual(response_json["data"], "the data is not json")
+        self.assertEqual(response_json["data"], NOT_JSON)
 
 
 class UserTestCase(TestCase):
     def setUp(self):
-        User.objects.create(name="lion", password="123456")
-        User.objects.create(name="cat", password="654321")
+        User.objects.create(name="lion", pwhash="123456")
+        User.objects.create(name="cat", pwhash="654321")
  
     def test_user_db(self):
         """Animals that can speak are correctly identified"""
         lion = User.objects.get(name="lion")
         cat = User.objects.get(name="cat")
-        self.assertEqual(lion.password, '123456')
-        self.assertEqual(cat.password, '654321')
+        self.assertEqual(lion.pwhash, '123456')
+        self.assertEqual(cat.pwhash, '654321')
         self.assertEqual(str(lion), "lion")
         self.assertEqual(str(cat), "cat")
 
 
 class SearchHistoryTest(TestCase):
     def setUp(self):
-        User.objects.create(name="test", password="123456")
-        User.objects.create(name="test_his", password="654321")
+        User.objects.create(name="test", pwhash="123456")
+        User.objects.create(name="test_his", pwhash="654321")
         user = User.objects.filter(name="test").first()
         SearchHistory.objects.create(user=user, content="test content1")
         SearchHistory.objects.create(user=user, content="test content2")
@@ -126,7 +129,7 @@ class SearchHistoryTest(TestCase):
         response = client.post(search_log_url, data="{123", content_type=CONTENT_TYPE)
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 400)
-        self.assertEqual(response_json["data"], "the data is not json")
+        self.assertEqual(response_json["data"], NOT_JSON)
 
     def test_read_history(self):
         client = Client()
@@ -139,13 +142,13 @@ class SearchHistoryTest(TestCase):
         response = client.get("/api/searchhis")
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 400)
-        self.assertEqual(response_json["data"], "user name should not be None or blank")
+        self.assertEqual(response_json["data"], USER_NAME_NONE)
 
 
 class BrowseHistoryTest(TestCase):
     def setUp(self):
-        User.objects.create(name="test", password="123456")
-        User.objects.create(name="test_his", password="654321")
+        User.objects.create(name="test", pwhash="123456")
+        User.objects.create(name="test_his", pwhash="654321")
         user = User.objects.filter(name="test").first()
         BrowseHistory.objects.create(
             user=user, uid="123456", title="test title1", imgurl="",
@@ -191,7 +194,7 @@ class BrowseHistoryTest(TestCase):
         response = client.post(browse_log_url, data="{123", content_type=CONTENT_TYPE)
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 400)
-        self.assertEqual(response_json["data"], "the data is not json") 
+        self.assertEqual(response_json["data"], NOT_JSON) 
 
     def test_read_history(self):
         client = Client()
@@ -223,4 +226,36 @@ class BrowseHistoryTest(TestCase):
         response = client.get("/api/browsehis")
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 400)
-        self.assertEqual(response_json["data"], "user name should not be None or blank")
+        self.assertEqual(response_json["data"], USER_NAME_NONE)
+
+
+class KeyWordTest(TestCase):
+    def setUp(self):
+        User.objects.create(name="test", pwhash="123456")
+        User.objects.create(name="test1", pwhash="654321")
+        user = User.objects.filter(name="test").first()
+        KeyWord.objects.create(user=user, keyword="新闻")
+        KeyWord.objects.create(user=user, keyword="美国")
+
+    def test_get_recommand(self):
+        client = Client()
+        response = client.get("/api/recommend?username=test&number=10&page=0")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(len(response_json["data"]), 10)
+        self.assertIsNotNone(response_json["total"])
+
+        response = client.post("/api/recommend")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "POST method not supported, please use GET")
+
+        response = client.get("/api/recommend?number=10&page=0")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], USER_NAME_NONE)
+
+    def test_extract_keyword(self):
+        user = User.objects.filter(name="test").first()
+        keyword_list = extract_keywords("[][][]蚂蚁集团重新上市或被推迟半年, 新疆新增新冠肺炎确诊病例2例", user, topk=5)
+        self.assertEqual(len(keyword_list), 5)

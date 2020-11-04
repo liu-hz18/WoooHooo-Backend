@@ -1,8 +1,11 @@
 import time
 import random
 import hashlib
+from jieba.analyse import textrank
 import yagmail
 from yagmail.error import YagInvalidEmailAddress, YagConnectionClosed, YagAddressError
+
+from .models import KeyWord
 
 sender_email = "1456437967@qq.com"
 sender_code = "zvopussnugrtbabh"
@@ -54,3 +57,12 @@ def send_validation_email(username, email_addr):
         return "-1"
     hash_key = md5(key)
     return hash_key
+
+
+def extract_keywords(content, user, topk=5):
+    keywords = textrank(content, topK=topk, withWeight=True)
+    print(keywords)
+    keyword_list = []
+    for keyword, _ in keywords:
+        keyword_list.append(KeyWord(user=user, keyword=keyword))
+    return keyword_list
