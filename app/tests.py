@@ -5,7 +5,7 @@ from django.test import TestCase, Client
 
 from .apps import AppLocalConfig
 from .views import gen_bad_response
-from .newsapi import decode, io_db
+from .newsapi import decode, io_db, fetch_hotlist
 
 BAIDU_POSTFIX = "//www.baidu.com"
 
@@ -69,3 +69,12 @@ class APITest(TestCase):
         self.assertEqual(news_ret["imgurl"], "http:" + BAIDU_POSTFIX)
         news_ret = decode({"_id": 0, "url": "", "content": "", "source": "", "publish_time": "", "title": "", "top_img": BAIDU_POSTFIX, "imageurl": [BAIDU_POSTFIX, BAIDU_POSTFIX]})
         self.assertEqual(news_ret["imgurl"], "http:" + BAIDU_POSTFIX)
+
+    def test_hotlist(self):
+        result = fetch_hotlist(fetch=False)
+        self.assertEqual(len(result), 0)
+        client = Client()
+        response = client.post("/api/hot")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "POST not supported, please use GET")
