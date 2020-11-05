@@ -5,7 +5,7 @@ from django.test import TestCase, Client
 
 from .apps import AppLocalConfig
 from .views import gen_bad_response
-from .newsapi import decode, io_db, fetch_hotlist
+from .newsapi import decode, io_db, fetch_hotlist, exit_server
 
 BAIDU_POSTFIX = "//www.baidu.com"
 
@@ -45,6 +45,7 @@ class APITest(TestCase):
         page = 0
         client = Client()
         page = -1
+        exit_server()
         response = client.post("/api/search", data={"page": page, "number": number, "newstype": "热点"}, content_type="application/json")
         response_json = response.json()
         self.assertEqual(response_json["code"], 400)
