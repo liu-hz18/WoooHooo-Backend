@@ -15,7 +15,13 @@ local_port = 27018 # should be different from `db_port`
 colomn_name = "news"
 http_prefix = "http:"
 lucene_url = "https://wooohooo-indexquery-wooohooo.app.secoder.net/queryNews"
-
+server = SSHTunnelForwarder(
+    ssh_address_or_host=(host, port),  # 远程主机ip, port
+    ssh_username=username,  # ssh用户名密码
+    ssh_password=password,
+    remote_bind_address=('127.0.0.1', db_port),     # 远程服务ip, port
+    local_bind_address=('localhost', local_port)    # 转发到本地服务ip, port
+)
 type_map = {
     "热点": "news",
     "国内": "politics",
@@ -29,6 +35,12 @@ type_map = {
     "科技": "science", # "tech"
     "游戏": "game",
 }
+
+def start_server():
+    server.start()
+
+def exit_server():
+    server.close()
 
 def decode(news):
     if news["top_img"] and len(news["top_img"]) > 5:
@@ -60,33 +72,25 @@ def io_db(news_col, query, ret_field, begin, number):
 def fetch_typed_news(news_type, number, page):
     total = 0
     result = []
-    with SSHTunnelForwarder(
-        ssh_address_or_host=(host, port),  # 远程主机ip, port
-        ssh_username=username,  # ssh用户名密码
-        ssh_password=password,
-        remote_bind_address=('127.0.0.1', db_port),     # 远程服务ip, port
-        local_bind_address=('localhost', local_port)    # 转发到本地服务ip, port
-    ) as server:
-        newsdb_client = pymongo.MongoClient(f"mongodb://localhost:{local_port}/")
-        newsdb = newsdb_client[database_name]
-        news_col = newsdb[type_map[news_type]]
-        print(news_col)
-        query = {}
-        ret_field = { # 为1的字段会返回
-            '_id': 1,
-            "title": 1,
-            "publish_time": 1,
-            "source": 1,
-            "imageurl": 1,
-            "url": 1,
-            'content': 1,
-            "top_img": 1,
-        }
-        print(total, page, number)
-        if number < 100:
-            total, result = io_db(news_col, query, ret_field, page*number, number)
-        newsdb_client.close()
-        server.close()
+    newsdb_client = pymongo.MongoClient(f"mongodb://localhost:{local_port}/")
+    newsdb = newsdb_client[database_name]
+    news_col = newsdb[type_map[news_type]]
+    print(news_col)
+    query = {}
+    ret_field = { # 为1的字段会返回
+        '_id': 1,
+        "title": 1,
+        "publish_time": 1,
+        "source": 1,
+        "imageurl": 1,
+        "url": 1,
+        'content': 1,
+        "top_img": 1,
+    }
+    print(total, page, number)
+    if number < 100:
+        total, result = io_db(news_col, query, ret_field, page*number, number)
+    newsdb_client.close()
     print("**** exit from server ****")
     return total, result
 
@@ -112,22 +116,14 @@ def fetch_search_result(query, number, page, relation=1):
 
 def fetch_hotlist(fetch=True):
     result = []
-    with SSHTunnelForwarder(
-        ssh_address_or_host=(host, port),  # 远程主机ip, port
-        ssh_username=username,  # ssh用户名密码
-        ssh_password=password,
-        remote_bind_address=('127.0.0.1', db_port),     # 远程服务ip, port
-        local_bind_address=('localhost', local_port)    # 转发到本地服务ip, port
-    ) as server:
-        newsdb_client = pymongo.MongoClient(f"mongodb://localhost:{local_port}/")
-        newsdb = newsdb_client[database_name]
-        news_col = newsdb["hot_click"]
-        print(news_col)
-        ret_field = {'_id': 1, "rank": 1, "title": 1, "url": 1, "publish_time": 1}
-        if fetch:
-            for x in news_col.find({}, ret_field).sort([("rank", pymongo.ASCENDING)]):  # 注意限制个数，不然数据量可能极大
-                result.append({"uid": str(x["_id"]), "title": x["title"], "link": x["url"], "time": x["publish_time"]})
-        newsdb_client.close()
-        server.close()
+    newsdb_client = pymongo.MongoClient(f"mongodb://localhost:{local_port}/")
+    newsdb = newsdb_client[database_name]
+    news_col = newsdb["hot_click"]
+    print(news_col)
+    ret_field = {'_id': 1, "rank": 1, "title": 1, "url": 1, "publish_time": 1}
+    if fetch:
+        for x in news_col.find({}, ret_field).sort([("rank", pymongo.ASCENDING)]):  # 注意限制个数，不然数据量可能极大
+            result.append({"uid": str(x["_id"]), "title": x["title"], "link": x["url"], "time": x["publish_time"]})
+    newsdb_client.close()
     print("**** exit from server ****")
     return result
