@@ -22,6 +22,7 @@ server = SSHTunnelForwarder(
     remote_bind_address=('127.0.0.1', db_port),     # 远程服务ip, port
     local_bind_address=('localhost', local_port)    # 转发到本地服务ip, port
 )
+server.start()
 type_map = {
     "热点": "news",
     "国内": "politics",
@@ -35,12 +36,6 @@ type_map = {
     "科技": "science", # "tech"
     "游戏": "game",
 }
-
-def start_server():
-    server.start()
-
-def exit_server():
-    server.close()
 
 def decode(news):
     if news["top_img"] and len(news["top_img"]) > 5:
