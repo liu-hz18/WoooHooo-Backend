@@ -20,7 +20,7 @@ class BrowseHistory(models.Model):
     uid = models.CharField(unique=True, max_length=200)
     title = models.CharField(max_length=100)
     content = models.CharField(max_length=500)
-    imgurl = models.CharField(max_length=200, null=True, blank=True)
+    imgurl = models.CharField(max_length=200)
     link = models.CharField(max_length=200)
     source = models.CharField(max_length=200)
     time = models.CharField(max_length=100)
