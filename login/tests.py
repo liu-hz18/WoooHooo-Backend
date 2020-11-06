@@ -245,6 +245,12 @@ class KeyWordTest(TestCase):
         self.assertEqual(len(response_json["data"]), 10)
         self.assertIsNotNone(response_json["total"])
 
+        response = client.get("/api/recommend?username=test1&number=10&page=0")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(len(response_json["data"]), 10)
+        self.assertIsNotNone(response_json["total"])
+
         response = client.post("/api/recommend")
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 400)

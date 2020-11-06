@@ -84,7 +84,7 @@ def hot(request):
     if request.method == "GET":
         return JsonResponse({
             'code': 200,
-            'data': fetch_hotlist(fetch=True)
+            'data': fetch_hotlist()
         }, status=200)
     else:
         return JsonResponse({

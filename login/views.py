@@ -108,13 +108,14 @@ def browsehis(request):
             return gen_response(400, "username don't exist.")
         print(user, news, name)
         browsing_history = BrowseHistory(
-            user=user, uid=news.get("uid"), title=news.get("title"), imgurl=news.get("imgurl"), 
+            user=user, uid=news.get("uid"), title=news.get("title"), imgurl=news.get("img"), 
             content=news.get("content"), link=news.get("link"), source=news.get("source"), time=news.get("time")
         )
         try:
             browsing_history.full_clean()
             browsing_history.save()
-        except ValidationError as _:
+        except ValidationError as e:
+            print(e)
             return gen_response(400, 'news info length is too long')
         # 保存用户浏览标题的关键词
         KeyWord.objects.bulk_create(extract_keywords(news.get("title"), user, topk=5))  # 批量存储
@@ -222,6 +223,7 @@ def user(request):
         if not name or name == "":
             return gen_response(400, USER_NAME_NONE)
         user = User.objects.filter(name=name).first()
+        print(user, user.phone_number, user.mail)
         return JsonResponse({
             "code": 200,
             "phone": user.phone_number,

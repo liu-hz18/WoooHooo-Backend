@@ -53,7 +53,7 @@ class APITest(TestCase):
         response = client.post("/api/search", data={"page": page, "number": number, "newstype": "国内"}, content_type="application/json")
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 200)
-        self.assertEqual(len(response_json["data"]), 0)
+        self.assertEqual(len(response_json["data"]), number)
 
     def test_app_config(self):
         self.assertEqual(AppLocalConfig.name, 'app')
@@ -71,9 +71,11 @@ class APITest(TestCase):
         self.assertEqual(news_ret["imgurl"], "http:" + BAIDU_POSTFIX)
 
     def test_hotlist(self):
-        result = fetch_hotlist(fetch=False)
-        self.assertEqual(len(result), 0)
         client = Client()
+        response = client.get("/api/hot")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(len(response_json["data"]), 10)
         response = client.post("/api/hot")
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 400)
