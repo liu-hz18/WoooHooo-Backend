@@ -166,6 +166,7 @@ class BrowseHistoryTest(TestCase):
         client = Client()
         response = client.post(browse_log_url, data={"username": "test_his", "newsinfo": newsinfo}, content_type=CONTENT_TYPE)
         response_json = json.loads(response.content)
+        print(response.content)
         self.assertEqual(response_json["code"], 200)
         self.assertEqual(response_json["data"], "browsing history logged successfully")
 

@@ -106,9 +106,10 @@ def browsehis(request):
         user = User.objects.filter(name=name).first()
         if not user:
             return gen_response(400, "username don't exist.")
-        print(user, news, name)
+        print(user, news, name, news)
+        img = (news.get("imgurl")) if (news.get("imgurl") != "") else "blank"
         browsing_history = BrowseHistory(
-            user=user, uid=news.get("uid"), title=news.get("title"), imgurl=news.get("img"), 
+            user=user, uid=news.get("uid"), title=news.get("title"), imgurl=img, 
             content=news.get("content"), link=news.get("link"), source=news.get("source"), time=news.get("time")
         )
         try:
@@ -116,7 +117,7 @@ def browsehis(request):
             browsing_history.save()
         except ValidationError as e:
             print(e)
-            return gen_response(400, 'news info length is too long')
+            return gen_response(400, "news info length is too long")
         # 保存用户浏览标题的关键词
         KeyWord.objects.bulk_create(extract_keywords(news.get("title"), user, topk=5))  # 批量存储
         return gen_response(200, "browsing history logged successfully")
