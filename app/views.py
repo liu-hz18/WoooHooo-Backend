@@ -4,7 +4,7 @@ import jieba
 from django.http.response import JsonResponse
 from django.shortcuts import HttpResponse
 
-from .newsapi import fetch_typed_news, fetch_search_result, fetch_hotlist
+from .newsapi import fetch_typed_news, fetch_search_result, fetch_hotlist, fetch_hot_search
 # Create your views here.
 
 def gen_bad_response(code: int, data: list, keywords: list):
@@ -85,6 +85,19 @@ def hot(request):
         return JsonResponse({
             'code': 200,
             'data': fetch_hotlist()
+        }, status=200)
+    else:
+        return JsonResponse({
+            'code': 400,
+            'data': "POST not supported, please use GET"
+        }, status=400)
+
+
+def hot_search(request):
+    if request.method == "GET":
+        return JsonResponse({
+            'code': 200,
+            'data': fetch_hot_search()
         }, status=200)
     else:
         return JsonResponse({

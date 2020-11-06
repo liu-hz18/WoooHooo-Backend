@@ -80,3 +80,14 @@ class APITest(TestCase):
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 400)
         self.assertEqual(response_json["data"], "POST not supported, please use GET")
+
+    def test_hot_search(self):
+        client = Client()
+        response = client.get("/api/hotsearch")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(len(response_json["data"]), 10)
+        response = client.post("/api/hotsearch")
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "POST not supported, please use GET")

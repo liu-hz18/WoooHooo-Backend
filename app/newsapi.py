@@ -106,3 +106,17 @@ def fetch_hotlist():
     newsdb_client.close()
     print("**** exit from server ****")
     return result
+
+
+def fetch_hot_search():
+    result = []
+    newsdb_client = pymongo.MongoClient(f"mongodb://{host}:{db_port}/")
+    newsdb = newsdb_client[database_name]
+    news_col = newsdb["hot_search"]
+    print(news_col)
+    ret_field = {'_id': 1, "title": 1, "value": 1}
+    for x in news_col.find({}, ret_field).limit(10):  # 注意限制个数，不然数据量可能极大
+        result.append({"uid": str(x["_id"]), "title": x["title"], "value": x["value"]})
+    newsdb_client.close()
+    print("**** exit from server ****")
+    return result
