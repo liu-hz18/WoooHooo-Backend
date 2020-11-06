@@ -2,27 +2,13 @@
 import json
 import requests
 import pymongo
-from sshtunnel import SSHTunnelForwarder
 
 host = "49.233.52.61"
-port = 22
-# better changed to SSH
-username = "ubuntu"
-password = "48*~VbNY93Aq"
 database_name = "NewsCopy"
-db_port = 27017
-local_port = 27018 # should be different from `db_port`
+db_port = 30001
 colomn_name = "news"
 http_prefix = "http:"
 lucene_url = "https://wooohooo-indexquery-wooohooo.app.secoder.net/queryNews"
-server = SSHTunnelForwarder(
-    ssh_address_or_host=(host, port),  # 远程主机ip, port
-    ssh_username=username,  # ssh用户名密码
-    ssh_password=password,
-    remote_bind_address=('127.0.0.1', db_port),     # 远程服务ip, port
-    local_bind_address=('localhost', local_port)    # 转发到本地服务ip, port
-)
-server.start()
 type_map = {
     "热点": "news",
     "国内": "politics",
@@ -67,7 +53,7 @@ def io_db(news_col, query, ret_field, begin, number):
 def fetch_typed_news(news_type, number, page):
     total = 0
     result = []
-    newsdb_client = pymongo.MongoClient(f"mongodb://localhost:{local_port}/")
+    newsdb_client = pymongo.MongoClient(f"mongodb://{host}:{db_port}/")
     newsdb = newsdb_client[database_name]
     news_col = newsdb[type_map[news_type]]
     print(news_col)
@@ -83,10 +69,9 @@ def fetch_typed_news(news_type, number, page):
         "top_img": 1,
     }
     print(total, page, number)
-    if number < 100:
-        total, result = io_db(news_col, query, ret_field, page*number, number)
+    total, result = io_db(news_col, query, ret_field, page*number, number)
     newsdb_client.close()
-    print("**** exit from server ****")
+    print("**** exit from DB ****")
     return total, result
 
 
@@ -109,16 +94,15 @@ def fetch_search_result(query, number, page, relation=1):
     return total, result
 
 
-def fetch_hotlist(fetch=True):
+def fetch_hotlist():
     result = []
-    newsdb_client = pymongo.MongoClient(f"mongodb://localhost:{local_port}/")
+    newsdb_client = pymongo.MongoClient(f"mongodb://{host}:{db_port}/")
     newsdb = newsdb_client[database_name]
     news_col = newsdb["hot_click"]
     print(news_col)
     ret_field = {'_id': 1, "rank": 1, "title": 1, "url": 1, "publish_time": 1}
-    if fetch:
-        for x in news_col.find({}, ret_field).sort([("rank", pymongo.ASCENDING)]):  # 注意限制个数，不然数据量可能极大
-            result.append({"uid": str(x["_id"]), "title": x["title"], "link": x["url"], "time": x["publish_time"]})
+    for x in news_col.find({}, ret_field).sort([("rank", pymongo.ASCENDING)]):  # 注意限制个数，不然数据量可能极大
+        result.append({"uid": str(x["_id"]), "title": x["title"], "link": x["url"], "time": x["publish_time"]})
     newsdb_client.close()
     print("**** exit from server ****")
     return result
