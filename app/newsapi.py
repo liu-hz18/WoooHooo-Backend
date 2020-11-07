@@ -101,7 +101,11 @@ def fetch_hotlist():
     news_col = newsdb["hot_click"]
     print(news_col)
     ret_field = {'_id': 1, "rank": 1, "title": 1, "url": 1, "publish_time": 1}
-    for x in news_col.find({}, ret_field).sort([("rank", pymongo.ASCENDING)]):  # 注意限制个数，不然数据量可能极大
+    for x in news_col.find({}, ret_field).sort([("rank", pymongo.ASCENDING)]).limit(10):  # 注意限制个数，不然数据量可能极大
+        result.append({"uid": str(x["_id"]), "title": x["title"], "link": x["url"], "time": x["publish_time"]})
+    news_col = newsdb["hot_comment"]
+    ret_field = {'_id': 1, "rank": 1, "title": 1, "url": 1, "publish_time": 1}
+    for x in news_col.find({}, ret_field).sort([("rank", pymongo.ASCENDING)]).limit(10):
         result.append({"uid": str(x["_id"]), "title": x["title"], "link": x["url"], "time": x["publish_time"]})
     newsdb_client.close()
     print("**** exit from server ****")
