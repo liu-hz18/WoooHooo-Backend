@@ -2,13 +2,14 @@
 import json
 import requests
 import pymongo
+from bs4 import BeautifulSoup as bs
 
 host = "49.233.52.61"
 database_name = "NewsCopy"
 db_port = 30001
 colomn_name = "news"
 http_prefix = "http:"
-lucene_url = "https://wooohooo-indexquery-wooohooo.app.secoder.net/queryNews"
+lucene_url = "http://49.233.52.61:30002/queryNews"
 type_map = {
     "热点": "news",
     "国内": "politics",
@@ -25,13 +26,13 @@ type_map = {
 
 def decode(news):
     if news["top_img"] and len(news["top_img"]) > 5:
-        img_url = http_prefix + news["top_img"]
+        img_url = http_prefix + news["top_img"].lstrip("http:")
     else:
         imgs = news["imageurl"]
         if isinstance(imgs, str):
             imgs = json.loads(imgs)
         if len(imgs) > 0:
-            img_url = http_prefix + imgs[0]
+            img_url = http_prefix + imgs[0].lstrip("http:")
         else:
             img_url = ""
     return {
@@ -124,3 +125,19 @@ def fetch_hot_search():
     newsdb_client.close()
     print("**** exit from server ****")
     return result
+
+
+def get_related_search(content):
+    headers = {
+        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
+    }
+    base_url = f"https://www.sogou.com/web?query={content}"
+    response = requests.get(base_url, headers=headers)
+    response.raise_for_status()
+    response.encoding = 'utf-8'
+    soup = bs(response.text, "html.parser")
+    title = soup.select("#hint_container > tr > td > p > a")
+    title_list = []
+    for index in title:
+        title_list.append(index.text.split()[0])
+    return title_list

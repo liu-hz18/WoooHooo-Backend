@@ -28,13 +28,19 @@ class APITest(TestCase):
 
     def test_search_api(self):
         number = 24
-        page = 1
+        page = 0
         client = Client()
         response = client.get(f"/api/search?page={page}&number={number}&query=新闻")
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 200)
         self.assertEqual(len(response_json["data"]), number)
+        self.assertEqual(len(response_json["related"]), 12)
         self.check_news_json_ok(response_json["data"][0])
+
+        response = client.get(f"/api/search?page=1&number={number}&query=新闻")
+        response_json = json.loads(response.content)
+        self.assertEqual(len(response_json["related"]), 0)
+
         page = -1
         response = client.get(f"/api/search?page={page}&number={number}&query=新闻")
         response_json = json.loads(response.content)
