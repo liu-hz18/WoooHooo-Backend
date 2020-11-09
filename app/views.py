@@ -4,7 +4,7 @@ import jieba
 from django.http.response import JsonResponse
 from django.shortcuts import HttpResponse
 
-from .newsapi import fetch_typed_news, fetch_search_result, fetch_hotlist, fetch_hot_search
+from .newsapi import fetch_typed_news, fetch_search_result, fetch_hotlist, fetch_hot_search, get_related_search
 # Create your views here.
 
 def gen_bad_response(code: int, data: list, keywords: list):
@@ -55,11 +55,16 @@ def search(request):
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
         total, newslist = fetch_search_result(query, number, page, relation)
+        if page == 0:
+            related_search = get_related_search(query)
+        else:
+            related_search = []
         return JsonResponse({
             'code': 200,
             'data': newslist,
             'keywords': keywords,
-            'total': total
+            'total': total,
+            'related': related_search,
         }, status=200)
     elif request.method == "POST":
         print(request.body.decode())

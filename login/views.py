@@ -230,3 +230,29 @@ def user(request):
             "phone": user.phone_number,
             "mail": user.mail,
         })
+
+
+def update(request):
+    if request.method == "POST":
+        print(request.body.decode())
+        try:
+            user = json.loads(request.body.decode())
+        except json.JSONDecodeError:
+            return gen_response(400, NOT_JSON_INFO)
+        username = user.get('username')
+        pwhash = user.get('userpass')
+        if not username or not pwhash or username == "" or pwhash == "":
+            return gen_response(400, "there is no username or password")
+        # 检查用户是否已经存在
+        user = User.objects.filter(name=username).first()
+        if not user:
+            return gen_response(400, "user don't exist")
+        user.pwhash = pwhash
+        print(username, pwhash)
+        try:
+            user.full_clean()
+            user.save() # 存入数据库
+            return gen_response(200, "user was set successfully")
+        except ValidationError as e:
+            print(e)
+            return gen_response(400, "passward is too long")

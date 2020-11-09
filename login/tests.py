@@ -79,6 +79,35 @@ class APITest(TestCase):
         self.assertEqual(response_json["code"], 400)
         self.assertEqual(response_json["data"], NOT_JSON)
 
+    def test_update(self):
+        update_url = "/api/update"
+        client = Client()
+        response = client.post(update_url, data={"username": "test", "userpass": "654321"}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(response_json["data"], "user was set successfully")
+        self.check_user_login("test", "654321", 200, "successful user validation")
+
+        response = client.post(update_url, data="{123", content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], NOT_JSON)
+
+        response = client.post(update_url, data={"username": "", "userpass": "654321"}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "there is no username or password")
+
+        response = client.post(update_url, data={"username": "a"*10, "userpass": "654321"}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "user don't exist")
+
+        response = client.post(update_url, data={"username": "test", "userpass": "a"*1000}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], "passward is too long")
+
 
 class UserTestCase(TestCase):
     def setUp(self):
