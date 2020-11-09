@@ -9,7 +9,7 @@ database_name = "NewsCopy"
 db_port = 30001
 colomn_name = "news"
 http_prefix = "http:"
-lucene_url = "http://49.233.52.61:30002/queryNews"
+lucene_url = f"{http_prefix}//{host}:30002/queryNews"
 type_map = {
     "热点": "news",
     "国内": "politics",
@@ -137,6 +137,7 @@ def get_related_search(content):
     response.encoding = 'utf-8'
     soup = bs(response.text, "html.parser")
     title = soup.select("#hint_container > tr > td > p > a")
+    print(title)
     title_list = []
     for index in title:
         title_list.append(index.text.split()[0])
