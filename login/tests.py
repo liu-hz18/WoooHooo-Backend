@@ -264,8 +264,10 @@ class KeyWordTest(TestCase):
         User.objects.create(name="test", pwhash="123456")
         User.objects.create(name="test1", pwhash="654321")
         user = User.objects.filter(name="test").first()
-        KeyWord.objects.create(user=user, keyword="新闻")
-        KeyWord.objects.create(user=user, keyword="美国")
+        key1 = KeyWord.objects.create(keyword="新闻")
+        key1.user.set([user])
+        key2 = KeyWord.objects.create(keyword="美国")
+        key2.user.set([user])
 
     def test_get_recommand(self):
         client = Client()
