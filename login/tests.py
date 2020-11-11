@@ -165,7 +165,7 @@ class SearchHistoryTest(TestCase):
         response = client.get("/api/searchhis?username=test")
         response_json = json.loads(response.content)
         self.assertEqual(response_json["code"], 200)
-        self.assertEqual(response_json["data"], ["test content1", "test content2"])
+        self.assertEqual(response_json["data"], ["test content2", "test content1"])
         self.assertEqual(int(response_json["total"]), 2)
 
         response = client.get("/api/searchhis")
@@ -233,8 +233,8 @@ class BrowseHistoryTest(TestCase):
         self.assertEqual(response_json["code"], 200)
         self.assertEqual(response_json["data"], [
             {
-                "uid": "123456",
-                "title": "test title1",
+                "uid": "654321",
+                "title": "test title2",
                 "imgurl": "",
                 "content": "",
                 "link": "",
@@ -242,8 +242,8 @@ class BrowseHistoryTest(TestCase):
                 "time": "",
             },
             {
-                "uid": "654321",
-                "title": "test title2",
+                "uid": "123456",
+                "title": "test title1",
                 "imgurl": "",
                 "content": "",
                 "link": "",
