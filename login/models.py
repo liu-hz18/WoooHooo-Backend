@@ -28,5 +28,5 @@ class BrowseHistory(models.Model):
 
 
 class KeyWord(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # 外键指向User的主键, 跟随外键删除
+    user = models.ManyToManyField(User)  # 外键指向User的主键, 跟随外键删除
     keyword = models.CharField(unique=True, max_length=30)

@@ -20,7 +20,7 @@ def gen_response(code: int, data: str):
 
 
 def login(request):
-    #Get用来验证登录
+    # Get用来验证登录
     if request.method == 'GET':
         print(request.GET.items())
         username = request.GET.get('username', default="")
@@ -38,7 +38,7 @@ def login(request):
         if user.pwhash == pwhash:
             return gen_response(200, "successful user validation")
         return gen_response(400, "password Error")
-    #用Post来完成注册
+    # 用Post来完成注册
     elif request.method == 'POST':
         print(request.body.decode())
         try:
@@ -119,7 +119,7 @@ def browsehis(request):
             print(e)
             return gen_response(400, "news info length is too long")
         # 保存用户浏览标题的关键词
-        KeyWord.objects.bulk_create(extract_keywords(news.get("title"), user, topk=5))  # 批量存储
+        extract_keywords(news.get("title"), user, topk=5)  # 批量存储
         return gen_response(200, "browsing history logged successfully")
     elif request.method == "GET":
         name = request.GET.get('username', default="")
@@ -169,7 +169,7 @@ def searchhis(request):
         except ValidationError as _:
             return gen_response(400, 'search content length is too long')
         # 保存用户浏览标题的关键词
-        KeyWord.objects.bulk_create(extract_keywords(content, user, topk=5))  # 批量存储
+        extract_keywords(content, user, topk=5)  # 批量存储
         return gen_response(200, "searching history logged successfully")
     elif request.method == "GET":
         name = request.GET.get('username', default="")
@@ -199,14 +199,15 @@ def recommend(request):
         keyword_search = []
         keywords = user.keyword_set.all()
         num_keywords = len(keywords)
-        print(keywords, num_keywords)
+        print("keywords:", num_keywords)
+        print(keywords)
         if num_keywords > 1:
             for keyword in keywords:
                 keyword_search.append(keyword.keyword)
             to_search = " ".join(keyword_search)
             print(to_search)
             # 到lucene去检索
-            total, newslist = fetch_search_result(to_search, number, page, relation=1)
+            total, newslist = fetch_search_result(to_search, number, page, relation=0)
         else: # 直接返回热点新闻
             total, newslist = fetch_typed_news("热点", number, page)
         return JsonResponse({

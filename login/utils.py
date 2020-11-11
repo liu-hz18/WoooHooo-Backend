@@ -60,9 +60,11 @@ def send_validation_email(username, email_addr):
 
 
 def extract_keywords(content, user, topk=5):
-    keywords = textrank(content, topK=topk, withWeight=True)
+    keywords = textrank(content, topK=topk, withWeight=True, allowPOS=('n', 'v'))
     print(keywords)
     keyword_list = []
     for keyword, _ in keywords:
-        keyword_list.append(KeyWord(user=user, keyword=keyword))
+        keyw = KeyWord.objects.create(keyword=keyword)
+        keyw.user.set([user])
+        keyword_list.append(keyw)
     return keyword_list

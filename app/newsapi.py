@@ -13,7 +13,7 @@ colomn_name = "news"
 http_prefix = "http:"
 lucene_url = f"{http_prefix}//{host}:30002/queryNews"
 type_map = {
-    "热点": "news",
+    "热点": "hot",
     "国内": "politics",
     "文化": "history",  # "cul"
     "社会": "social",
@@ -102,7 +102,7 @@ def fetch_typed_news(news_type, number, page):
     return total, result
 
 
-def fetch_search_result(query, number, page, relation=1):
+def fetch_search_result(query, number, page, relation=0):
     result = []
     #向java端发送检索请求
     params = {
@@ -169,8 +169,8 @@ def get_related_search(content):
     response.encoding = 'utf-8'
     soup = bs(response.text, "html.parser")
     title = soup.select("#hint_container > tr > td > p > a")
-    print(title)
+    print(title, headers["User-Agent"])
     title_list = []
     for index in title:
-        title_list.append(index.text.split()[0])
+        title_list.append(index.text)
     return title_list
