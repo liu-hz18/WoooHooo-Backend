@@ -60,7 +60,7 @@ def send_validation_email(username, email_addr):
 
 
 def extract_keywords(content, user, topk=5):
-    keywords = textrank(content, topK=topk, withWeight=True, allowPOS=('n', 'v'))
+    keywords = textrank(content, topK=topk, withWeight=True, allowPOS=('n', 'nt', 'nr', 'vn'))
     print(keywords)
     keyword_list = []
     for keyword, _ in keywords:

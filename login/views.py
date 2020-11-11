@@ -106,7 +106,7 @@ def browsehis(request):
         user = User.objects.filter(name=name).first()
         if not user:
             return gen_response(400, "username don't exist.")
-        print(user, news, name, news)
+        print(user, news, name)
         img = (news.get("imgurl")) if (news.get("imgurl") != "") else "blank"
         browsing_history = BrowseHistory(
             user=user, uid=news.get("uid"), title=news.get("title"), imgurl=img, 
@@ -119,7 +119,7 @@ def browsehis(request):
             print(e)
             return gen_response(400, "news info length is too long")
         # 保存用户浏览标题的关键词
-        extract_keywords(news.get("title"), user, topk=5)  # 批量存储
+        extract_keywords(news.get("title"), user, topk=3)  # 批量存储
         return gen_response(200, "browsing history logged successfully")
     elif request.method == "GET":
         name = request.GET.get('username', default="")
@@ -129,7 +129,7 @@ def browsehis(request):
         result = []
         browse_his = user.browsehistory_set.all()
         total = browse_his.count()
-        for history in browse_his:
+        for history in reversed(browse_his):
             result.append({
                 "uid": history.uid,
                 "title": history.title,
@@ -169,7 +169,7 @@ def searchhis(request):
         except ValidationError as _:
             return gen_response(400, 'search content length is too long')
         # 保存用户浏览标题的关键词
-        extract_keywords(content, user, topk=5)  # 批量存储
+        extract_keywords(content, user, topk=3)  # 批量存储
         return gen_response(200, "searching history logged successfully")
     elif request.method == "GET":
         name = request.GET.get('username', default="")
@@ -179,7 +179,7 @@ def searchhis(request):
         result = []
         search_his = user.searchhistory_set.all()
         total = search_his.count()
-        for history in search_his:
+        for history in list(reversed(search_his))[:10]:
             result.append(history.content)
         return JsonResponse({
             "code": 200,
@@ -202,7 +202,7 @@ def recommend(request):
         print("keywords:", num_keywords)
         print(keywords)
         if num_keywords > 1:
-            for keyword in keywords:
+            for keyword in list(reversed(keywords))[:20]:
                 keyword_search.append(keyword.keyword)
             to_search = " ".join(keyword_search)
             print(to_search)
