@@ -4,9 +4,16 @@ import jieba
 from django.http.response import JsonResponse
 from django.shortcuts import HttpResponse
 
-from .newsapi import fetch_typed_news, fetch_search_result
+from .newsapi import fetch_typed_news, fetch_search_result, fetch_hotlist, fetch_hot_search, get_related_search
 # Create your views here.
 
+def gen_bad_response(code: int, data: list, keywords: list):
+    return JsonResponse({
+        'code': code,
+        'data': data,
+        'keywords': keywords,
+        'total': 0,
+    }, status=code)
 
 def index(request):
     """function index"""
@@ -37,32 +44,27 @@ def search(request):
                keywords: use `jieba` to split query
            }
     """
-    def gen_bad_response(code: int, data: list, keywords: list):
-        return JsonResponse({
-            'code': code,
-            'data': data,
-            'keywords': keywords,
-            'total': 0,
-        }, status=code)
     if request.method == "GET":
         keywords = []
         page = int(request.GET.get('page', default=0))
         number = int(request.GET.get('number', default=10))
         query = request.GET.get('query', default="")
-        keywords = sorted(jieba.lcut_for_search(query), key=len, reverse=True)
+        relation = int(request.GET.get('relation', default=0))
+        keywords = sorted(jieba.lcut_for_search(query, HMM=False), key=len, reverse=True)
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
             return gen_bad_response(400, [], keywords)
-        try:
-            total, newslist = fetch_search_result(query, number, page)
-        except Exception as e:
-            total, newslist = 0, []
-            print("error in search():", e)
+        total, newslist = fetch_search_result(query, number, page, relation)
+        if page == 0:
+            related_search = get_related_search(query)
+        else:
+            related_search = []
         return JsonResponse({
             'code': 200,
             'data': newslist,
             'keywords': keywords,
-            'total': total
+            'total': total,
+            'related': related_search,
         }, status=200)
     elif request.method == "POST":
         print(request.body.decode())
@@ -81,3 +83,29 @@ def search(request):
             'keywords': [],
             'total': total,
         }, status=200)
+
+
+def hot(request):
+    if request.method == "GET":
+        return JsonResponse({
+            'code': 200,
+            'data': fetch_hotlist()
+        }, status=200)
+    else:
+        return JsonResponse({
+            'code': 400,
+            'data': "POST not supported, please use GET"
+        }, status=400)
+
+
+def hot_search(request):
+    if request.method == "GET":
+        return JsonResponse({
+            'code': 200,
+            'data': fetch_hot_search()
+        }, status=200)
+    else:
+        return JsonResponse({
+            'code': 400,
+            'data': "POST not supported, please use GET"
+        }, status=400)

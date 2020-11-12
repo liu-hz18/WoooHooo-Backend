@@ -25,3 +25,4 @@ xunit-reports/
 .idea
 .vscode
 simulate.sh
+htmlcov/
