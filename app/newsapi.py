@@ -11,18 +11,19 @@ database_name = "NewsCopy"
 db_port = 30001
 colomn_name = "news"
 http_prefix = "http:"
+https_prefix = "https:"
 lucene_url = f"{http_prefix}//{host}:30002/queryNews"
 type_map = {
     "热点": "hot",
     "国内": "politics",
-    "文化": "history",  # "cul"
+    "文化": "history",
     "社会": "social",
     "国际": "chuguo",
     "军事": "mil",
     "财经": "finance",
     "娱乐": "ent",
     "体育": "sports", 
-    "科技": "science", # "tech"
+    "科技": "science",
     "游戏": "game",
 }
 pc_agent = [
@@ -36,7 +37,6 @@ pc_agent = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11",
     "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Maxthon 2.0)",
     "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; TencentTraveler 4.0)",
-    "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; The World)",
     "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; SE 2.X MetaSr 1.0; SE 2.X MetaSr 1.0; .NET CLR 2.0.50727; SE 2.X MetaSr 1.0)",
     "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; 360SE)",
     "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Avant Browser)",
@@ -47,13 +47,13 @@ referer = lambda url: re.search(r"^((http://)|(https://))?([a-zA-Z0-9]([a-zA-Z0-
 
 def decode(news):
     if news["top_img"] and len(news["top_img"]) > 5:
-        img_url = http_prefix + news["top_img"].lstrip(http_prefix)
+        img_url = http_prefix + news["top_img"].lstrip(https_prefix).lstrip(http_prefix)
     else:
         imgs = news["imageurl"]
         if isinstance(imgs, str):
             imgs = json.loads(imgs)
         if len(imgs) > 0:
-            img_url = http_prefix + imgs[0].lstrip(http_prefix)
+            img_url = http_prefix + imgs[0].lstrip(https_prefix).lstrip(http_prefix)
         else:
             img_url = ""
     return {
