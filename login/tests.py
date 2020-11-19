@@ -51,6 +51,28 @@ class APITest(TestCase):
         self.assertEqual(response_json["code"], 400)
         self.assertEqual(response_json["data"], NOT_JSON)
 
+        api_check = "/api/check"
+        response = client.post(api_check, data={"username": "test"}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(response_json["data"], 'error')
+
+        response = client.post(api_check, data={"username": "test123456"}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 200)
+        self.assertEqual(response_json["data"], 'ok')
+
+        response = client.post(api_check, data={"username": ""}, content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], 'there is no username')
+
+        response = client.post(api_check, data="{name: ", content_type=CONTENT_TYPE)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["code"], 400)
+        self.assertEqual(response_json["data"], NOT_JSON)
+
+
     def check_validate(self, name, mail, code, content):
         client = Client()
         response = client.post("/api/validate", data={"username": name, "mail": mail}, content_type=CONTENT_TYPE)

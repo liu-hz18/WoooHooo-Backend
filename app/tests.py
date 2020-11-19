@@ -42,7 +42,6 @@ class APITest(TestCase):
         self.assertEqual(len(response_json["related"]), 0)
 
         response = client.get(f"/api/search?page=1&number={number}&query=新闻 你好")
-        response_json = json.loads(response.content)
 
         page = -1
         response = client.get(f"/api/search?page={page}&number={number}&query=新闻")
