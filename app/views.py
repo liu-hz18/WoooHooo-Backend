@@ -52,7 +52,7 @@ def search(request):
         relation = int(request.GET.get('relation', default=0))
         keywords = jieba.lcut(query)
         if ' ' in keywords:
-            keywords = keywords.remove(' ')
+            keywords.remove(' ')
         keywords = sorted(keywords, key=len, reverse=True)
         print(page, number, query, keywords)
         if page < 0 or number > 100 or query == "":       
