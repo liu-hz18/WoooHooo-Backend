@@ -11,4 +11,5 @@ urlpatterns = [
     path('recommend', views.recommend, name='recommend'),
     path('user', views.user, name="user"),
     path('update', views.update, name="update"),
+    path('check', views.check, name="check"),
 ]
