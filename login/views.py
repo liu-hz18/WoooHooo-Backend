@@ -257,3 +257,19 @@ def update(request):
         except ValidationError as e:
             print(e)
             return gen_response(400, "passward is too long")
+
+
+def check(request):
+    if request.method == "POST":
+        print("check:", request.body.decode())
+        try:
+            user = json.loads(request.body.decode())
+        except json.JSONDecodeError:
+            return gen_response(400, NOT_JSON_INFO)
+        username = user.get('username')
+        if not username or username == "":
+            return gen_response(400, "there is no username")
+        user = User.objects.filter(name=username).first()
+        if user:
+            return gen_response(200, "error")
+        return gen_response(200, "ok")
